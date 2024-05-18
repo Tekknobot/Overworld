@@ -113,7 +113,7 @@ func find_valid_tiles(cell):
 	
 func generate_world():
 	
-	tilelist = [0, 1, 2, 3, 4, 5]
+	tilelist = [0, 1, 2, 3, 4, 5, 6]
 		
 	fastNoiseLite.seed = rng.randi_range(0, 256)
 	fastNoiseLite.TYPE_PERLIN
@@ -400,7 +400,7 @@ func spawn_stadiums():
 func spawn_districts():
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:		
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 6:		
 				var tile_pos = Vector2i(i, j)
 				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 				var district_inst = district.instantiate()
