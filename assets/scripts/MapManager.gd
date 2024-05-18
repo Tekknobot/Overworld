@@ -275,7 +275,7 @@ func spawn_structures():
 		Map.set_cell(0, Vector2i(my_random_tile_x, my_random_tile_y), 11, Vector2i(0, 0), 0)
 		progresscount += 1
 
-	for i in 64: #towers
+	for i in 128: #towers
 		var my_random_tile_x = rng.randi_range(1, grid_width-2)
 		var my_random_tile_y = rng.randi_range(1, grid_width-2)
 		Map.set_cell(0, Vector2i(my_random_tile_x, my_random_tile_y), 13, Vector2i(0, 0), 0)
@@ -305,7 +305,7 @@ func spawn_structures():
 	structures_blank.append_array(stadiumsblank)
 	structures_blank.append_array(districtsblank)		
 				
-	for i in 64: #towersblank
+	for i in 128: #towersblank
 		var my_random_tile_x = rng.randi_range(1, grid_width-2)
 		var my_random_tile_y = rng.randi_range(1, grid_width-2)	
 		my_odd_x = my_random_tile_x + ((my_random_tile_x+1)%2 * sign(my_random_tile_x-my_odd_x))	
@@ -368,9 +368,9 @@ func spawn_buildings():
 	spawn_stadiums()	
 				
 func spawn_stadiums():
-	for i in grid_width:
-		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 10:	
+	for i in grid_width/2:
+		for j in grid_height/2:
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:	
 				var tile_pos = Vector2i(i, j)
 				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 				var stadium_inst = stadium.instantiate()
@@ -395,9 +395,9 @@ func spawn_stadiums():
 	spawn_districts()
 	
 func spawn_districts():
-	for i in grid_width:
-		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 11:		
+	for i in grid_width/2:
+		for j in grid_height/2:
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:		
 				var tile_pos = Vector2i(i, j)
 				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 				var district_inst = district.instantiate()
@@ -422,7 +422,7 @@ func spawn_districts():
 	spawn_towers_final()
 	
 func spawn_towers_final():
-	for l in 64:
+	for l in 128:
 		for i in grid_width:
 			for j in grid_height:
 				if Map.get_cell_source_id(0, Vector2i(i,j)) == 13:	
