@@ -71,6 +71,7 @@ var tower_coord : Array[Vector2i]
 var tower_int = 0
 
 var empty_tiles : Array[Vector2i]
+var open_tiles = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():	
@@ -89,7 +90,7 @@ func move(dir):
 func generate_tile(cell):
 		var _cells = find_valid_tiles(cell)
 		Map.set_cell(0, map_pos, -1, Vector2i(0, 0), 0)
-		Map.set_cell(0, map_pos, tile_id, Vector2i(0, 0), 0)		
+		Map.set_cell(0, map_pos, tile_id, Vector2i(0, 0), 0)	
 		
 func find_valid_tiles(cell):
 	var valid_tiles = []
