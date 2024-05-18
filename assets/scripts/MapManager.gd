@@ -445,6 +445,8 @@ func spawn_towers_final():
 	towers = get_tree().get_nodes_in_group("towers")
 	structures.append_array(towers)
 	add_to_structures_array()
+	
+	#surround_by_water()
 							
 func add_to_structures_array():
 	buildings2 = get_tree().get_nodes_in_group("buildings2")
@@ -496,6 +498,15 @@ func check_duplicates(a):
 				a[j].get_child(0).modulate.a = 1	
 				a[j].z_index = tile_pos_j.x + tile_pos_j.y
 				Map.astar_grid.set_point_solid(j_pos, true)				
+
+func surround_by_water():
+	for i in grid_width:
+		for j in grid_height:
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 41 or Map.get_cell_source_id(0, Vector2i(i,j)) == 42 or Map.get_cell_source_id(0, Vector2i(i,j)) == 43:	
+				var cells = Map.get_surrounding_cells(Vector2i(i,j))
+				for k in cells.size():
+					if Map.get_cell_source_id(0, cells[k]) == 0:
+						Map.set_cell(0, Vector2i(i,j), 0, Vector2i(0, 0), 0)		
 				
 func _on_button_pressed():
 	get_tree().reload_current_scene()
