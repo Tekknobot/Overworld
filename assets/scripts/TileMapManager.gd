@@ -35,7 +35,8 @@ func _input(event):
 				mouse_position.y += 8
 				var tile_pos = local_to_map(mouse_position)	
 				if astar_grid.is_point_solid(tile_pos):
-					show_path(tile_pos)
+					#show_path(tile_pos)
+					pass
 				
 func show_path(tile_pos):
 	#Remove hover tiles										

@@ -275,11 +275,14 @@ func spawn_structures():
 		Map.set_cell(0, Vector2i(my_random_tile_x, my_random_tile_y), 11, Vector2i(0, 0), 0)
 		progresscount += 1
 
-	for i in 128: #towers
-		var my_random_tile_x = rng.randi_range(1, grid_width-2)
-		var my_random_tile_y = rng.randi_range(1, grid_width-2)
-		Map.set_cell(0, Vector2i(my_random_tile_x, my_random_tile_y), 13, Vector2i(0, 0), 0)
-		progresscount += 1			
+	for i in grid_width: #towers
+		for j in grid_height:
+			var my_random_tile_x = rng.randi_range(1, grid_width-2)
+			var my_random_tile_y = rng.randi_range(1, grid_width-2)
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 5:	
+				Map.set_cell(0, Vector2i(i, j), 13, Vector2i(0, 0), 0)
+				tower_coord.append((Vector2i(i,j)))
+				progresscount += 1			
 					
 	buildings = get_tree().get_nodes_in_group("buildings")
 	buildings2 = get_tree().get_nodes_in_group("buildings2")
@@ -368,8 +371,8 @@ func spawn_buildings():
 	spawn_stadiums()	
 				
 func spawn_stadiums():
-	for i in grid_width/2:
-		for j in grid_height/2:
+	for i in grid_width:
+		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:	
 				var tile_pos = Vector2i(i, j)
 				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
@@ -395,8 +398,8 @@ func spawn_stadiums():
 	spawn_districts()
 	
 func spawn_districts():
-	for i in grid_width/2:
-		for j in grid_height/2:
+	for i in grid_width:
+		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:		
 				var tile_pos = Vector2i(i, j)
 				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
@@ -421,13 +424,8 @@ func spawn_districts():
 	
 	spawn_towers_final()
 	
-func spawn_towers_final():
-	for l in 128:
-		for i in grid_width:
-			for j in grid_height:
-				if Map.get_cell_source_id(0, Vector2i(i,j)) == 13:	
-					tower_coord.append((Vector2i(i,j)))
-					
+func spawn_towers_final():				
+	for l in tower_coord.size():	
 		var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 		var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 		var tower_inst = tower.instantiate()
