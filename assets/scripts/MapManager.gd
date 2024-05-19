@@ -89,7 +89,9 @@ func move(dir):
 	
 func generate_tile(cell):
 		var _cells = find_valid_tiles(cell)
-		Map.set_cell(0, map_pos, -1, Vector2i(0, 0), 0)
+		#check for water
+		if Map.get_cell_source_id(0, map_pos) == 0:
+			return
 		Map.set_cell(0, map_pos, tile_id, Vector2i(0, 0), 0)	
 		
 func find_valid_tiles(cell):
@@ -132,7 +134,7 @@ func generate_world():
 			Map.set_cell(0, Vector2i(x,y), tilelist[tiletoplace], Vector2i(0, 0), 0)	
 			progresscount += 1	
 	
-	await spawn_structures()
+	await intersections()
 
 func intersections():
 	for i in grid_height/4:
@@ -199,10 +201,10 @@ func generate_roads():
 					if Map.get_cell_source_id(0, surrounding_cells[0]) == 42 and Map.get_cell_source_id(0, surrounding_cells[1]) == 41 and Map.get_cell_source_id(0, surrounding_cells[2]) == 42 and Map.get_cell_source_id(0, surrounding_cells[3]) == 41:
 						Map.set_cell(0, Vector2i(i,j), 43, Vector2i(0, 0), 0)
 						progresscount += 1	
-
+	
 	spawn_buildings()
 	
-func spawn_structures():						
+func spawn_structures(): #useless				
 	# Randomize structures at start	
 	for i in 128: #buildings
 		var my_random_tile_x = rng.randi_range(1, grid_width-2)
@@ -324,7 +326,7 @@ func spawn_structures():
 		towerblank_inst.z_index = tile_pos.x + tile_pos.y
 		progresscount += 1
 
-	intersections()
+	#intersections()
 
 func spawn_buildings():
 	for i in grid_width:
@@ -425,7 +427,16 @@ func spawn_districts():
 	
 	spawn_towers_final()
 	
-func spawn_towers_final():				
+func spawn_towers_final():	
+	for i in grid_width: #towers
+		for j in grid_height:
+			var my_random_tile_x = rng.randi_range(1, grid_width-2)
+			var my_random_tile_y = rng.randi_range(1, grid_width-2)
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 5:	
+				Map.set_cell(0, Vector2i(i, j), 13, Vector2i(0, 0), 0)
+				tower_coord.append((Vector2i(i,j)))
+				progresscount += 1	
+								
 	for l in tower_coord.size():	
 		var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 		var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
@@ -446,7 +457,7 @@ func spawn_towers_final():
 	structures.append_array(towers)
 	add_to_structures_array()
 	
-	#surround_by_water()
+	replace_with_water()
 							
 func add_to_structures_array():
 	buildings2 = get_tree().get_nodes_in_group("buildings2")
@@ -499,14 +510,14 @@ func check_duplicates(a):
 				a[j].z_index = tile_pos_j.x + tile_pos_j.y
 				Map.astar_grid.set_point_solid(j_pos, true)				
 
-func surround_by_water():
+func replace_with_water():
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 41 or Map.get_cell_source_id(0, Vector2i(i,j)) == 42 or Map.get_cell_source_id(0, Vector2i(i,j)) == 43:	
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 41 or Map.get_cell_source_id(0, Vector2i(i,j)) == 42:	
 				var cells = Map.get_surrounding_cells(Vector2i(i,j))
 				for k in cells.size():
-					if Map.get_cell_source_id(0, cells[k]) == 0:
-						Map.set_cell(0, Vector2i(i,j), 0, Vector2i(0, 0), 0)		
-				
+					if Map.get_cell_source_id(0, cells[1]) == 0 or Map.get_cell_source_id(0, cells[3]) == 0:
+						Map.set_cell(0, Vector2i(i,j), 0, Vector2i(0, 0), 0)
+					
 func _on_button_pressed():
 	get_tree().reload_current_scene()
