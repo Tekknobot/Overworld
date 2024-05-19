@@ -29,13 +29,13 @@ func _input(event):
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 				
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:	
-			if event.pressed:
-				var mouse_position = get_global_mouse_position()
-				mouse_position.y += 8
-				var tile_pos = local_to_map(mouse_position)	
-				show_path(tile_pos)
+	#if event is InputEventMouseButton:
+		#if event.button_index == MOUSE_BUTTON_LEFT:	
+			#if event.pressed:
+				#var mouse_position = get_global_mouse_position()
+				#mouse_position.y += 8
+				#var tile_pos = local_to_map(mouse_position)	
+				#show_path(tile_pos)
 					
 				
 func show_path(tile_pos):
