@@ -6,12 +6,6 @@ extends Node2D
 var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 
 var point1 : Vector2
-#@export var point2 : Vector2 = Vector2(0, 0)
-@export_range(1, 1000) var segments : int = 100
-@export var width : int = 10
-@export var color : Color = Color.GREEN
-@export var antialiasing : bool = false
-
 var _point2 : Vector2
 
 var grid_width = 64
@@ -31,7 +25,7 @@ func _process(_delta):
 		
 func _input(event):		
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT:	
+		if event.button_index == MOUSE_BUTTON_LEFT:	
 			if event.pressed:			 
 				var mouse_position = get_global_mouse_position()
 				if mouse_position != _point2:
@@ -39,7 +33,7 @@ func _input(event):
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2
 					point1 = tile_center_pos
 							
-		if event.button_index == MOUSE_BUTTON_LEFT:	
+		if event.button_index == MOUSE_BUTTON_RIGHT:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
 				if mouse_position != _point2:
