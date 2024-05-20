@@ -51,15 +51,16 @@ func _input(event):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1:
 			for i in 1:
+				var dup = self.duplicate()
+				self.get_parent().add_child(dup)
+				dup.add_to_group("trajectories")					
 				var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 				var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 				var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 				var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
 				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 				$"../AudioStreamPlayer2D".play()						
-				_cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)	
-				#var dup = self.duplicate()
-				#self.get_parent().add_child(dup)							
+				await dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)								
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	var line_inst = line2D.instantiate()
@@ -101,5 +102,5 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 		await get_tree().create_timer(0.05).timeout
 	
 	line_inst.hide()
-			
+							
 	await get_tree().create_timer(0.3).timeout		
