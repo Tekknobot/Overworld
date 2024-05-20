@@ -18,6 +18,7 @@ var trajectory_set = false
 var trajectory_end = false
 
 var points = []
+var onTrajectory = false
 
 func ready():
 	pass
@@ -49,7 +50,7 @@ func _input(event):
 					await _cubic_bezier(line_2d, point1, Vector2(0, -250), Vector2(0, -250), _point2, 1)
 
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1:
+		if event.keycode == KEY_1 and onTrajectory == false:
 			for i in 1:
 				var dup = self.duplicate()
 				self.get_parent().add_child(dup)
@@ -60,9 +61,11 @@ func _input(event):
 				var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
 				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 				$"../AudioStreamPlayer2D".play()						
-				await dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)								
+				await dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
+				dup.queue_free()
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
+	onTrajectory = true
 	var line_inst = line2D.instantiate()
 	add_child(line_inst)
 					
@@ -103,4 +106,5 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	
 	line_inst.hide()
 							
-	await get_tree().create_timer(0.3).timeout		
+	await get_tree().create_timer(0.3).timeout
+	onTrajectory = false			
