@@ -365,11 +365,12 @@ func spawn_buildings():
 				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
 				progresscount += 1		
 
-	buildings2 = get_tree().get_nodes_in_group("buildings2")
-	structures.append_array(buildings)
-	structures.append_array(towers)
-	structures.append_array(stadiums)
-	structures.append_array(districts)
+	#buildings2 = get_tree().get_nodes_in_group("buildings2")
+	#structures.append_array(buildings)
+	#structures.append_array(buildings2)
+	#structures.append_array(towers)
+	#structures.append_array(stadiums)
+	#structures.append_array(districts)
 					
 	spawn_stadiums()	
 				
@@ -392,11 +393,10 @@ func spawn_stadiums():
 				Map.set_cell(0, Vector2i(i, j), 10, Vector2i(0, 0), 0)
 				progresscount += 1
 				
-	buildings2 = get_tree().get_nodes_in_group("buildings2")
-	structures.append_array(buildings)
-	structures.append_array(towers)
-	structures.append_array(stadiums)
-	structures.append_array(districts)
+	#structures.append_array(buildings)
+	#structures.append_array(towers)
+	#structures.append_array(stadiums)
+	#structures.append_array(districts)
 		
 	spawn_districts()
 	
@@ -419,11 +419,10 @@ func spawn_districts():
 				Map.set_cell(0, Vector2i(i, j), 11, Vector2i(0, 0), 0)
 				progresscount += 1
 
-	buildings2 = get_tree().get_nodes_in_group("buildings2")
-	structures.append_array(buildings)
-	structures.append_array(towers)
-	structures.append_array(stadiums)
-	structures.append_array(districts)
+	#structures.append_array(buildings)
+	#structures.append_array(towers)
+	#structures.append_array(stadiums)
+	#structures.append_array(districts)
 	
 	spawn_towers_final()
 	
@@ -451,17 +450,16 @@ func spawn_towers_final():
 		Map.set_cell(0, tile_pos, 9, Vector2i(0, 0), 0)
 		progresscount += 1						
 		#await get_tree().create_timer(0).timeout				
-	
-	buildings2 = get_tree().get_nodes_in_group("buildings2")							
-	towers = get_tree().get_nodes_in_group("towers")
-	structures.append_array(towers)
+								
+	#towers = get_tree().get_nodes_in_group("towers")
+	#structures.append_array(towers)
 	add_to_structures_array()
 	
 	replace_with_water()
 							
 func add_to_structures_array():
-	buildings2 = get_tree().get_nodes_in_group("buildings2")
 	buildings = get_tree().get_nodes_in_group("buildings")
+	buildings2 = get_tree().get_nodes_in_group("buildings2")
 	towers = get_tree().get_nodes_in_group("towers")
 	stadiums = get_tree().get_nodes_in_group("stadiums")
 	districts = get_tree().get_nodes_in_group("districts")
