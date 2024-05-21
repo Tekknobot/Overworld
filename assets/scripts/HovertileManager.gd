@@ -30,4 +30,5 @@ func _process(delta):
 			var tween: Tween = create_tween()
 			var random = rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)
 			tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
+			get_node("/root/Node2D").structures[i].get_child(0).play("default")	
 			await get_tree().create_timer(0).timeout
