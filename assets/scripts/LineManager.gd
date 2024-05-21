@@ -37,18 +37,22 @@ func _input(event):
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2
 					point1 = tile_center_pos
 							
-		if event.button_index == MOUSE_BUTTON_RIGHT:	
+		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				if mouse_position != _point2:
+					var dup = self.duplicate()
+					self.get_parent().add_child(dup)
+					dup.add_to_group("trajectories")					
 					var tile_pos = Map.local_to_map(mouse_position)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2
 					_point2 = mouse_position
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
-					await _cubic_bezier(line_2d, point1, Vector2(0, -250), Vector2(0, -250), _point2, 1)
-
+					await dup._cubic_bezier(line_2d, point1, Vector2(0, -250), Vector2(0, -250), _point2, 1)
+					dup.queue_free()
+					
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			for i in 1:
@@ -90,7 +94,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 			get_parent().add_child(explosion_instance)
 			var explosion_pos = Map.map_to_local(get_node("/root/Node2D").structures[i].coord) + Vector2(0,0) / 2
 			explosion_instance.position = explosion_pos
-			explosion_instance.z_index = (point_pos.x + point_pos.y) + 4
+			explosion_instance.z_index = point_pos.x + point_pos.y
 				
 			$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 			$"../AudioStreamPlayer2D".play()	
