@@ -19,7 +19,6 @@ var trajectory_end = false
 
 var points = []
 var onTrajectory = false
-var intercepted = false
 
 func ready():
 	pass
@@ -37,10 +36,6 @@ func _input(event):
 					var dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")	
-
-					var dup2 = self.duplicate()
-					self.get_parent().add_child(dup2)
-					dup2.add_to_group("trajectories")	
 														
 					_point2 = mouse_position
 					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
@@ -49,11 +44,14 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2						
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
-					dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)
-					await dup2._intercept_bezier(line_2d, _point2, Vector2(0, -250), Vector2(0, -250), tile_pos, 1)
+					#dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -250), Vector2(0, -350), tile_pos, 1)
+					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
+					$"../AudioStreamPlayer2D".play()					
+					await dup._cubic_bezier(line_2d, tile_pos2, Vector2(0, -250), Vector2(0, -350), _point2, 1)
 					dup.queue_free()
-					dup2.queue_free()
-					
+	
+										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			for i in 1:
@@ -119,7 +117,6 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 		
 func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
-	intercepted = true
 	var line_inst = line2D.instantiate()
 	add_child(line_inst)
 					
