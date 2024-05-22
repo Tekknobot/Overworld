@@ -7,7 +7,7 @@ var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
 var sparks = preload("res://assets/scenes/vfx/blood.scn")
 
-var point1 : Vector2
+var point1 := Vector2(0, -100)
 var _point2 : Vector2
 
 var grid_width = 64
@@ -20,6 +20,7 @@ var trajectory_end = false
 var points = []
 var onTrajectory = false
 static var target
+static var traj
 
 func ready():
 	pass
@@ -42,10 +43,11 @@ func _input(event):
 					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2						
+					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2
+					#target = _point2						
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
-					await dup._cubic_bezier(line_2d, _point2, Vector2(0, -350), Vector2(0, -350), tile_pos, 1)	
+					await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), _point2, 1)	
 					dup.queue_free()
 					
 		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
@@ -63,7 +65,7 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()					
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -350), Vector2(0, -350), target, 1)	
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -250), Vector2(0, -250), target, 1)	
 					dup.queue_free()
 										
 	if event is InputEventKey and event.pressed:

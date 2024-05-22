@@ -17,7 +17,7 @@ func _input(event):
 	pass
 	
 	if event.is_action("zoom_in"):
-		self.zoomTarget = 1
+		self.zoomTarget = 2
 		pass
 	pass
 		
@@ -37,7 +37,7 @@ func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
 		get_viewport().set_input_as_handled()
 		if event.is_pressed():
-			_previousPosition = event.position;
+			_previousPosition = event.position
 			_moveCamera = true;
 		else:	
 			_moveCamera = false;
@@ -45,3 +45,5 @@ func _unhandled_input(event: InputEvent):
 		get_viewport().set_input_as_handled()
 		position += (_previousPosition - event.position);
 		_previousPosition = event.position;
+	
+	pass
