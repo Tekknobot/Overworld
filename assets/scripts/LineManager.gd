@@ -19,6 +19,7 @@ var trajectory_end = false
 
 var points = []
 var onTrajectory = false
+var intercepted = false
 
 func ready():
 	pass
@@ -50,7 +51,10 @@ func _input(event):
 					_point2 = mouse_position
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
-					await dup._cubic_bezier(line_2d, point1, Vector2(0, -250), Vector2(0, -250), _point2, 1)
+					dup._cubic_bezier(line_2d, point1, Vector2(0, -250), Vector2(0, -250), _point2, 1)
+					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+					var build_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2	
+					await _intercept_bezier(line_2d, build_pos, Vector2(0, -250), Vector2(0, -250), point1, 1)
 					dup.queue_free()
 					
 	if event is InputEventKey and event.pressed:
@@ -69,7 +73,59 @@ func _input(event):
 				dup.queue_free()
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
+	if intercepted == false:
+		onTrajectory = true
+		var line_inst = line2D.instantiate()
+		add_child(line_inst)
+						
+		var curve := Curve2D.new()
+		curve.add_point(p0, Vector2.ZERO, p1)
+		curve.add_point(p3, p2, Vector2.ZERO)
+		points = curve.get_baked_points()
+		for i in points.size():
+			line_inst.add_point(points[i])
+			await get_tree().create_timer(0).timeout
+
+		line_2d.clear_points()	
+		var point_position = Map.local_to_map(points[points.size()-1])
+		var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
+	
+		for i in get_node("/root/Node2D").structures.size():
+			if point_position == get_node("/root/Node2D").structures[i].coord:
+				var tween: Tween = create_tween()
+				for j in 8:
+					tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
+				get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
+				
+				var explosion_instance = explosion.instantiate()
+				get_parent().add_child(explosion_instance)
+				var explosion_pos = Map.map_to_local(get_node("/root/Node2D").structures[i].coord) + Vector2(0,0) / 2
+				explosion_instance.position = explosion_pos
+				explosion_instance.z_index = point_pos.x + point_pos.y
+					
+				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
+				$"../AudioStreamPlayer2D".play()	
+					
+		for i in 4:
+			line_inst.set_antialiased(false)
+			line_inst.set_width(1)	
+			line_inst.set_default_color(Color.WHITE_SMOKE)	
+			await get_tree().create_timer(0.05).timeout
+			line_inst.set_width(4)
+			line_inst.set_default_color(Color.GRAY)
+			await get_tree().create_timer(0.05).timeout
+		
+		line_inst.hide()
+								
+		await get_tree().create_timer(0.3).timeout
+		onTrajectory = false
+					
+	else:
+		self.queue_free()
+		
+func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
+	intercepted = true
 	var line_inst = line2D.instantiate()
 	add_child(line_inst)
 					
@@ -87,7 +143,8 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	for i in get_node("/root/Node2D").structures.size():
 		if point_position == get_node("/root/Node2D").structures[i].coord:
 			var tween: Tween = create_tween()
-			#tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
+			for j in 8:
+				tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
 			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
 			
 			var explosion_instance = explosion.instantiate()
