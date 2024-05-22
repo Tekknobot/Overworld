@@ -19,6 +19,7 @@ var trajectory_end = false
 
 var points = []
 var onTrajectory = false
+static var target
 
 func ready():
 	pass
@@ -44,13 +45,26 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2						
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
-					#dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -250), Vector2(0, -250), tile_pos2, 1)
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -250), Vector2(0, -350), tile_pos, 1)
+					await dup._cubic_bezier(line_2d, _point2, Vector2(0, -350), Vector2(0, -350), tile_pos, 1)	
+					dup.queue_free()
+					
+		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
+			if event.pressed:		 
+				var mouse_position = get_global_mouse_position()
+				mouse_position.y += 8
+				if mouse_position != _point2:
+					var dup = self.duplicate()
+					self.get_parent().add_child(dup)
+					dup.add_to_group("trajectories")										
+					_point2 = mouse_position		
+					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
+					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()					
-					await dup._cubic_bezier(line_2d, tile_pos2, Vector2(0, -250), Vector2(0, -350), _point2, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -350), Vector2(0, -350), target, 1)	
 					dup.queue_free()
-	
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
@@ -78,6 +92,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	points = curve.get_baked_points()
 	for i in points.size():
 		line_inst.add_point(points[i])
+		target = points[i]
 		await get_tree().create_timer(0).timeout
 
 	line_2d.clear_points()	
