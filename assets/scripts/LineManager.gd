@@ -7,7 +7,7 @@ var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
 var sparks = preload("res://assets/scenes/vfx/blood.scn")
 
-var point1 := Vector2(0, -100)
+var point1 := Vector2(0, -350)
 var _point2 : Vector2
 
 var grid_width = 64
@@ -20,8 +20,11 @@ var trajectory_end = false
 var points = []
 var onTrajectory = false
 static var target
-static var traj
 var missed = false
+
+static var dup
+static var dup_cpu
+
 
 func ready():
 	pass
@@ -65,7 +68,7 @@ func _input(event):
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				if mouse_position != _point2:
-					var dup = self.duplicate()
+					dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")										
 					_point2 = mouse_position		
@@ -85,17 +88,18 @@ func _input(event):
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 					$"../AudioStreamPlayer2D".play()					
-					if !self.traj:
+					if !self.dup_cpu:
 						return										
-					elif self.traj:
-						self.traj.queue_free()
+					elif self.dup_cpu:
+						self.dup_cpu.queue_free()
 						
 		if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
-				if mouse_position != _point2:
-					var dup = self.duplicate()
+				var mouse_local = Map.local_to_map(mouse_position)
+				if mouse_position != _point2 and Map.get_cell_source_id(1,mouse_local) == 14:
+					dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")										
 					_point2 = mouse_position		
@@ -105,7 +109,7 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-350), target, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-0), target, 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
@@ -115,32 +119,16 @@ func _input(event):
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 					$"../AudioStreamPlayer2D".play()					
-					if !self.traj:
+					if !self.dup_cpu:
 						return										
-					elif self.traj:
-						self.traj.queue_free()						
+					elif self.dup_cpu:
+						self.dup_cpu.queue_free()						
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			for i in 1:
-				var dup = self.duplicate()
-				self.get_parent().add_child(dup)
-				dup.add_to_group("trajectories")					
-				var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-				var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-				var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-				var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
-				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-				$"../AudioStreamPlayer2D".play()	
-				for j in get_node("/root/Node2D").structures.size():
-					if coord_B == get_node("/root/Node2D").structures[j].coord:
-						var tween: Tween = create_tween()
-						for k in 8:
-							tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
-				self.traj = dup	
-				Map.show_attack_range(coord_B)				
-				await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
-				dup.queue_free()
+				cpu_attack()
+				#await get_tree().create_timer(5).timeout
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
@@ -153,7 +141,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	points = curve.get_baked_points()
 	for i in points.size():
 		line_inst.add_point(points[i])
-		self.target = points[points.size()/1.5]
+		self.target = points[points.size()/2]
 		await get_tree().create_timer(0).timeout
 
 	#line_2d.clear_points()	
@@ -238,3 +226,29 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 							
 	await get_tree().create_timer(0.3).timeout
 	onTrajectory = false			
+
+func cpu_attack():
+	dup_cpu = self.duplicate()
+	self.get_parent().add_child(dup_cpu)
+	dup_cpu.add_to_group("trajectories")				
+	var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+	var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+	if coord_B.y < 32:
+		dup_cpu.queue_free()
+		cpu_attack()
+		return
+	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
+	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
+	$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
+	$"../AudioStreamPlayer2D".play()	
+	for j in get_node("/root/Node2D").structures.size():
+		if coord_B == get_node("/root/Node2D").structures[j].coord:
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
+	Map.show_attack_range(coord_B)				
+	await dup_cpu._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
+	if !dup_cpu:
+		return
+	elif dup_cpu:
+		dup_cpu.queue_free()	
