@@ -47,6 +47,7 @@ func _input(event):
 					#target = _point2						
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()						
+					traj = dup
 					await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), _point2, 1)	
 					dup.queue_free()
 					
@@ -64,9 +65,12 @@ func _input(event):
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					$"../AudioStreamPlayer2D".play()					
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -250), Vector2(0, -250), target, 1)	
+					$"../AudioStreamPlayer2D".play()				
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), target, 1)
 					dup.queue_free()
+					if !traj:
+						return	
+					traj.queue_free()
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
@@ -94,10 +98,10 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	points = curve.get_baked_points()
 	for i in points.size():
 		line_inst.add_point(points[i])
-		target = points[i]
+		target = points[points.size()/2]
 		await get_tree().create_timer(0).timeout
 
-	line_2d.clear_points()	
+	#line_2d.clear_points()	
 	var point_position = Map.local_to_map(points[points.size()-1])
 	var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
 
@@ -145,7 +149,7 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 		line_inst.add_point(points[i])
 		await get_tree().create_timer(0).timeout
 
-	line_2d.clear_points()	
+	#line_2d.clear_points()	
 	var point_position = Map.local_to_map(points[points.size()-1])
 	var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
 	for i in get_node("/root/Node2D").structures.size():
