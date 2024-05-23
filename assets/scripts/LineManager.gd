@@ -40,13 +40,19 @@ func _input(event):
 					dup.add_to_group("trajectories")	
 														
 					_point2 = mouse_position
+					var _point2_to_map =  Map.local_to_map(_point2)
 					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2
 					#target = _point2						
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					$"../AudioStreamPlayer2D".play()						
+					$"../AudioStreamPlayer2D".play()	
+					for j in get_node("/root/Node2D").structures.size():
+						if _point2_to_map == get_node("/root/Node2D").structures[j].coord:
+							var tween: Tween = create_tween()
+							for k in 8:
+								tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)										
 					traj = dup
 					await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), _point2, 1)	
 					dup.queue_free()
@@ -67,10 +73,7 @@ func _input(event):
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
 					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), self.target, 1)
-					dup.queue_free()
-					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[2]
-					$"../AudioStreamPlayer2D".play()	
-
+					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
 					var explosion_pos = Map.local_to_map(self.target)
@@ -95,6 +98,11 @@ func _input(event):
 				var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
 				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 				$"../AudioStreamPlayer2D".play()	
+				for j in get_node("/root/Node2D").structures.size():
+					if coord_B == get_node("/root/Node2D").structures[j].coord:
+						var tween: Tween = create_tween()
+						for k in 8:
+							tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
 				traj = dup					
 				await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
 				dup.queue_free()
@@ -175,7 +183,7 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 			get_parent().add_child(explosion_instance)
 			var explosion_pos = Map.map_to_local(get_node("/root/Node2D").structures[i].coord) + Vector2(0,0) / 2
 			explosion_instance.position = explosion_pos
-			explosion_instance.z_index = point_pos.x + point_pos.y
+			explosion_instance.z_index = (point_pos.x + point_pos.y) + 4
 				
 			$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 			$"../AudioStreamPlayer2D".play()	
