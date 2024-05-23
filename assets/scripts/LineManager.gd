@@ -68,8 +68,19 @@ func _input(event):
 					$"../AudioStreamPlayer2D".play()				
 					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), target, 1)
 					dup.queue_free()
+					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[2]
+					$"../AudioStreamPlayer2D".play()	
+
+					var explosion_instance = explosion.instantiate()
+					get_parent().add_child(explosion_instance)
+					var explosion_pos = Map.local_to_map(target)
+					explosion_instance.position = target
+					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4
+					
+					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
+					$"../AudioStreamPlayer2D".play()						
 					if !traj:
-						return	
+						return				
 					traj.queue_free()
 										
 	if event is InputEventKey and event.pressed:
