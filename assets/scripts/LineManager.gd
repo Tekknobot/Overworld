@@ -132,6 +132,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 			for j in 8:
 				tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
 			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
+			get_node("/root/Node2D").structures[i].modulate = Color.WHITE
 			
 			var explosion_instance = explosion.instantiate()
 			get_parent().add_child(explosion_instance)
@@ -178,7 +179,8 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 			var tween: Tween = create_tween()
 			for j in 8:
 				tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
-			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
+			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")
+			get_node("/root/Node2D").structures[i].modulate = Color.WHITE
 			
 			var explosion_instance = explosion.instantiate()
 			get_parent().add_child(explosion_instance)
