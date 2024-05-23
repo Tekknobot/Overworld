@@ -22,9 +22,8 @@ var onTrajectory = false
 static var target
 var missed = false
 
-static var dup
-static var dup_cpu
-
+var dup
+var dup_cpu
 
 func ready():
 	pass
@@ -88,10 +87,10 @@ func _input(event):
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 					$"../AudioStreamPlayer2D".play()					
-					if !self.dup_cpu:
+					if !dup_cpu:
 						return										
-					elif self.dup_cpu:
-						self.dup_cpu.queue_free()
+					elif dup_cpu:
+						dup_cpu.queue_free()
 						
 		if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
 			if event.pressed:		 
@@ -119,10 +118,10 @@ func _input(event):
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 					$"../AudioStreamPlayer2D".play()					
-					if !self.dup_cpu:
+					if !dup_cpu:
 						return										
-					elif self.dup_cpu:
-						self.dup_cpu.queue_free()						
+					elif dup_cpu:
+						dup_cpu.queue_free()						
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
