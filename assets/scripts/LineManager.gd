@@ -83,10 +83,8 @@ func _input(event):
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
 					$"../AudioStreamPlayer2D".play()						
 					if !traj:
-						return			
-					if !dup:
-						return							
-					elif traj and !dup:
+						return										
+					elif traj:
 						traj.queue_free()
 										
 	if event is InputEventKey and event.pressed:
