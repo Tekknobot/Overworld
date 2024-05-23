@@ -72,7 +72,7 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), self.target, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,0), Vector2(0,0), self.target, 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
