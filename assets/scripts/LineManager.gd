@@ -21,6 +21,7 @@ var points = []
 var onTrajectory = false
 static var target
 static var traj
+var missed = false
 
 func ready():
 	pass
@@ -53,7 +54,9 @@ func _input(event):
 							var tween: Tween = create_tween()
 							for k in 8:
 								tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)										
-					traj = dup
+					self.traj = dup
+					var _point2_map = Map.local_to_map(_point2)
+					Map.show_attack_range(_point2_map)
 					await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), _point2, 1)	
 					dup.queue_free()
 					
@@ -72,20 +75,20 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-100), Vector2(0,-100), self.target, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-100), Vector2(0,-100), target, 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
-					var explosion_pos = Map.local_to_map(self.target)
-					explosion_instance.position = self.target
+					var explosion_pos = Map.local_to_map(target)
+					explosion_instance.position = target
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					$"../AudioStreamPlayer2D".play()						
-					if !traj:
+					$"../AudioStreamPlayer2D".play()					
+					if !self.traj:
 						return										
-					elif traj:
-						traj.queue_free()
+					elif self.traj:
+						self.traj.queue_free()
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
@@ -104,7 +107,8 @@ func _input(event):
 						var tween: Tween = create_tween()
 						for k in 8:
 							tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
-				traj = dup					
+				self.traj = dup	
+				Map.show_attack_range(coord_B)				
 				await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
 				dup.queue_free()
 								
@@ -172,24 +176,24 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 		await get_tree().create_timer(0).timeout
 
 	#line_2d.clear_points()	
-	var point_position = Map.local_to_map(points[points.size()-1])
-	var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
-	for i in get_node("/root/Node2D").structures.size():
-		if point_position == get_node("/root/Node2D").structures[i].coord:
-			var tween: Tween = create_tween()
-			for j in 8:
-				tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
-			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")
-			get_node("/root/Node2D").structures[i].modulate = Color.WHITE
-			
-			var explosion_instance = explosion.instantiate()
-			get_parent().add_child(explosion_instance)
-			var explosion_pos = Map.map_to_local(get_node("/root/Node2D").structures[i].coord) + Vector2(0,0) / 2
-			explosion_instance.position = explosion_pos
-			explosion_instance.z_index = (point_pos.x + point_pos.y) + 4
-				
-			$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-			$"../AudioStreamPlayer2D".play()	
+	#var point_position = Map.local_to_map(points[points.size()-1])
+	#var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
+	#for i in get_node("/root/Node2D").structures.size():
+		#if point_position == get_node("/root/Node2D").structures[i].coord:
+			#var tween: Tween = create_tween()
+			#for j in 8:
+				#tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
+			#get_node("/root/Node2D").structures[i].get_child(0).play("demolished")
+			#get_node("/root/Node2D").structures[i].modulate = Color.WHITE
+			#
+			#var explosion_instance = explosion.instantiate()
+			#get_parent().add_child(explosion_instance)
+			#var explosion_pos = Map.map_to_local(get_node("/root/Node2D").structures[i].coord) + Vector2(0,0) / 2
+			#explosion_instance.position = explosion_pos
+			#explosion_instance.z_index = (point_pos.x + point_pos.y) + 4
+				#
+			#$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
+			#$"../AudioStreamPlayer2D".play()	
 				
 	for i in 2:
 		line_inst.set_antialiased(false)

@@ -23,6 +23,34 @@ func _process(_delta):
 	astar_grid.default_compute_heuristic = 1
 	astar_grid.diagonal_mode = 1
 	astar_grid.update()
+
+	#Remove tiles that are off map
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(-grid_height+h, i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(grid_height+h, i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(h, -grid_height+i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(h, grid_height+i), -1, Vector2i(0, 0), 0)
+	
+	#Remove tiles that are on the corner grids off map
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(-h-1, -i-1), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(h+grid_height, -i-1), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(-h-1, i+grid_height), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(1, Vector2i(h+grid_height, i+grid_height), -1, Vector2i(0, 0), 0)
 	
 func _input(event):
 	if event is InputEventKey:	
@@ -60,3 +88,60 @@ func show_path(tile_pos):
 		set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)										
 				
 
+func show_attack_range(tile_pos: Vector2i):
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	#Place hover tiles		
+	var surrounding_cells = get_node("../TileMap").get_surrounding_cells(tile_pos)
+	
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)									
+		if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+			set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+			set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
+											
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
