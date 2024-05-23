@@ -66,15 +66,15 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), target, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0, -50), Vector2(0, -50), self.target, 1)
 					dup.queue_free()
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[2]
 					$"../AudioStreamPlayer2D".play()	
 
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
-					var explosion_pos = Map.local_to_map(target)
-					explosion_instance.position = target
+					var explosion_pos = Map.local_to_map(self.target)
+					explosion_instance.position = self.target
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
@@ -94,8 +94,9 @@ func _input(event):
 				var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 				var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
 				$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-				$"../AudioStreamPlayer2D".play()						
-				await dup._cubic_bezier(line_2d, tile_pos, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
+				$"../AudioStreamPlayer2D".play()	
+				traj = dup					
+				await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
 				dup.queue_free()
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
@@ -109,7 +110,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	points = curve.get_baked_points()
 	for i in points.size():
 		line_inst.add_point(points[i])
-		target = points[points.size()/2]
+		self.target = points[points.size()/2]
 		await get_tree().create_timer(0).timeout
 
 	#line_2d.clear_points()	
@@ -165,10 +166,10 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 	var point_pos = Map.map_to_local(point_position) + Vector2(0,0) / 2
 	for i in get_node("/root/Node2D").structures.size():
 		if point_position == get_node("/root/Node2D").structures[i].coord:
-			var tween: Tween = create_tween()
-			for j in 8:
-				tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
-			get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
+			#var tween: Tween = create_tween()
+			#for j in 8:
+				#tween.tween_property(get_node("/root/Node2D").structures[i], "modulate:v", 1, 0.1).from(5)	
+			#get_node("/root/Node2D").structures[i].get_child(0).play("demolished")	
 			
 			var explosion_instance = explosion.instantiate()
 			get_parent().add_child(explosion_instance)
