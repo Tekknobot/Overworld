@@ -20,7 +20,7 @@ var trajectory_end = false
 var points = []
 var onTrajectory = false
 static var target
-static var cpu_traj
+var cpu_traj
 var missed = false
 
 
@@ -112,12 +112,11 @@ func _input(event):
 					explosion_instance.position = _temp
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					$"../AudioStreamPlayer2D".play()	
-					var _temp_traj = cpu_traj
-					if !_temp_traj:
-						return	
-					else:					
-						_temp_traj.queue_free()	
+					$"../AudioStreamPlayer2D".play()							
+					var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
+					for i in trajects.size():
+						trajects[0].queue_free()
+											
 					dup.queue_free()	
 										
 	if event is InputEventKey and event.pressed:
@@ -226,7 +225,7 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 func cpu_attack():
 	var dup_cpu = self.duplicate()
 	self.get_parent().add_child(dup_cpu)
-	dup_cpu.add_to_group("trajectories")
+	dup_cpu.add_to_group("trajectories_cpu")
 	cpu_traj = dup_cpu				
 	var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
