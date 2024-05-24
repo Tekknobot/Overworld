@@ -7,8 +7,12 @@ var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
 var sparks = preload("res://assets/scenes/vfx/blood.scn")
 
-var point1 := Vector2(0, -350)
+var point1 := Vector2(-700, -350)
+var point2 := Vector2(0, -350)
+var point3 := Vector2(700, -350)
 var _point2 : Vector2
+
+var _the_point: Vector2
 
 var grid_width = 64
 var grid_height = 64
@@ -26,41 +30,12 @@ var missed = false
 
 func ready():
 	pass
-
+				
 func _process(_delta):
 	pass
 
 func _input(event):		
-	if event is InputEventMouseButton:						
-		#if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
-			#if event.pressed:		 
-				#var mouse_position = get_global_mouse_position()
-				#mouse_position.y += 8
-				#if mouse_position != _point2:
-					#var dup = self.duplicate()
-					#self.get_parent().add_child(dup)
-					#dup.add_to_group("trajectories")	
-														#
-					#_point2 = mouse_position
-					#var _point2_to_map =  Map.local_to_map(_point2)
-					#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					#var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-					#var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2
-					##target = _point2						
-					#$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					#$"../AudioStreamPlayer2D".play()	
-					#for j in get_node("/root/Node2D").structures.size():
-						#if _point2_to_map == get_node("/root/Node2D").structures[j].coord:
-							#var tween: Tween = create_tween()
-							#for k in 8:
-								#tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)										
-					#self.traj = dup
-					#var _point2_map = Map.local_to_map(_point2)
-					#Map.show_attack_range(_point2_map)
-					#await dup._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), _point2, 1)	
-					#dup.queue_free()
-					
+	if event is InputEventMouseButton:											
 		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
@@ -76,12 +51,12 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
 					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-350), point1, 1)
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-350), choose_random_point(), 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
-					var explosion_pos = Map.local_to_map(point1)
-					explosion_instance.position = point1
+					var explosion_pos = Map.local_to_map(choose_random_point())
+					explosion_instance.position = choose_random_point()
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
@@ -243,5 +218,16 @@ func cpu_attack():
 			for k in 8:
 				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
 	Map.show_attack_range(coord_B)				
-	await dup_cpu._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)	
+	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)	
 	dup_cpu.queue_free()								
+
+func choose_random_point():
+	var rand = rng.randi_range(0,2)
+	if rand == 0:
+		_the_point = point1
+	if rand == 1:
+		_the_point = point2
+	if rand == 2:
+		_the_point = point3	
+		
+	return _the_point	

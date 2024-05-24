@@ -17,7 +17,7 @@ func _input(event):
 	pass
 	
 	if event.is_action("zoom_in"):
-		self.zoomTarget = 1
+		self.zoomTarget = 2
 		pass
 	pass
 		
