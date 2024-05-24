@@ -96,9 +96,7 @@ func _input(event):
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
-			for i in 1:
-				cpu_attack()
-				#await get_tree().create_timer(5).timeout
+			cpu_attack()
 								
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
@@ -204,10 +202,10 @@ func cpu_attack():
 	cpu_traj = dup_cpu				
 	var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-	if coord_B.y < 32:
-		dup_cpu.queue_free()
-		cpu_attack()
-		return
+	#if coord_B.y < 32:
+		#dup_cpu.queue_free()
+		#cpu_attack()
+		#return
 	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
 	$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
@@ -231,3 +229,7 @@ func choose_random_point():
 		_the_point = point3	
 		
 	return _the_point	
+
+
+func _on_timer_timeout():
+	cpu_attack()
