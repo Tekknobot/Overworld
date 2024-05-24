@@ -17,7 +17,7 @@ func _input(event):
 	pass
 	
 	if event.is_action("zoom_in"):
-		self.zoomTarget = 2
+		self.zoomTarget = 1
 		pass
 	pass
 		
@@ -34,7 +34,7 @@ func _zoom(delta):
 	pass
 
 func _unhandled_input(event: InputEvent):
-	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton && event.button_index == MOUSE_BUTTON_MIDDLE:
 		get_viewport().set_input_as_handled()
 		if event.is_pressed():
 			_previousPosition = event.position

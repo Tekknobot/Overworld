@@ -5,11 +5,12 @@ extends Node2D
 
 var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
-var sparks = preload("res://assets/scenes/vfx/blood.scn")
 
-var point1 := Vector2(-700, -350)
-var point2 := Vector2(0, -350)
-var point3 := Vector2(700, -350)
+var point1 := Vector2(0, -700)
+var point2 := Vector2(-1300, 300)
+var point3 := Vector2(1300, 300)
+var point4 := Vector2(0, 1700)
+
 var _point2 : Vector2
 
 var _the_point: Vector2
@@ -220,14 +221,16 @@ func cpu_attack():
 	dup_cpu.queue_free()								
 
 func choose_random_point():
-	var rand = rng.randi_range(0,2)
+	var rand = rng.randi_range(0,3)
 	if rand == 0:
 		_the_point = point1
 	if rand == 1:
 		_the_point = point2
 	if rand == 2:
 		_the_point = point3	
-		
+	if rand == 3:
+		_the_point = point4	
+				
 	return _the_point	
 
 
