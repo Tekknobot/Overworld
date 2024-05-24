@@ -20,10 +20,9 @@ var trajectory_end = false
 var points = []
 var onTrajectory = false
 static var target
+static var cpu_traj
 var missed = false
 
-var dup
-var dup_cpu
 
 func ready():
 	pass
@@ -67,7 +66,7 @@ func _input(event):
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				if mouse_position != _point2:
-					dup = self.duplicate()
+					var dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")										
 					_point2 = mouse_position		
@@ -86,11 +85,8 @@ func _input(event):
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					$"../AudioStreamPlayer2D".play()					
-					if !dup_cpu:
-						return										
-					elif dup_cpu:
-						dup_cpu.queue_free()
+					$"../AudioStreamPlayer2D".play()
+					dup.queue_free()								
 						
 		if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
 			if event.pressed:		 
@@ -98,7 +94,7 @@ func _input(event):
 				mouse_position.y += 8
 				var mouse_local = Map.local_to_map(mouse_position)
 				if mouse_position != _point2 and Map.get_cell_source_id(1,mouse_local) == 14:
-					dup = self.duplicate()
+					var dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")										
 					_point2 = mouse_position		
@@ -107,21 +103,22 @@ func _input(event):
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					$"../AudioStreamPlayer2D".play()				
-					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-0), target, 1)
-					dup.queue_free()		
+					$"../AudioStreamPlayer2D".play()	
+					var _temp = dup.target			
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-0), _temp, 1)		
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
-					var explosion_pos = Map.local_to_map(target)
-					explosion_instance.position = target
+					var explosion_pos = Map.local_to_map(_temp)
+					explosion_instance.position = _temp
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
-					
 					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					$"../AudioStreamPlayer2D".play()					
-					if !dup_cpu:
-						return										
-					elif dup_cpu:
-						dup_cpu.queue_free()						
+					$"../AudioStreamPlayer2D".play()	
+					var _temp_traj = cpu_traj
+					if !_temp_traj:
+						return	
+					else:					
+						_temp_traj.queue_free()	
+					dup.queue_free()	
 										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
@@ -140,7 +137,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	points = curve.get_baked_points()
 	for i in points.size():
 		line_inst.add_point(points[i])
-		self.target = points[points.size()/2]
+		target = points[points.size()/2]	
 		await get_tree().create_timer(0).timeout
 
 	#line_2d.clear_points()	
@@ -227,9 +224,10 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 	onTrajectory = false			
 
 func cpu_attack():
-	dup_cpu = self.duplicate()
+	var dup_cpu = self.duplicate()
 	self.get_parent().add_child(dup_cpu)
-	dup_cpu.add_to_group("trajectories")				
+	dup_cpu.add_to_group("trajectories")
+	cpu_traj = dup_cpu				
 	var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	if coord_B.y < 32:
@@ -246,8 +244,5 @@ func cpu_attack():
 			for k in 8:
 				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
 	Map.show_attack_range(coord_B)				
-	await dup_cpu._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)								
-	if !dup_cpu:
-		return
-	elif dup_cpu:
-		dup_cpu.queue_free()	
+	await dup_cpu._cubic_bezier(line_2d, point1, Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)	
+	dup_cpu.queue_free()								
