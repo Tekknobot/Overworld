@@ -78,8 +78,8 @@ func _input(event):
 		if event.pressed and event.keycode == KEY_2:
 			on_user()
 		if event.pressed and event.keycode == KEY_3:
-			on_cpu()
-									
+			on_cpu()		
+						
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
@@ -567,7 +567,8 @@ func on_user():
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var closest_cpu_to_human = cpu[target_human].get_closest_attack_humans()
 	
-	user_attack_ai(target_human, closest_cpu_to_human)	
+	await user_attack_ai(target_human, closest_cpu_to_human)	
+	on_cpu()
 	
 func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
 	if !closest_cpu_to_human:		
@@ -673,6 +674,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					break
 									
 			moving = false
+
 		else:
 			user_attack_ai(target_human, closest_cpu_to_human)
 	
@@ -697,14 +699,15 @@ func on_cpu():
 	var target_human = rng.randi_range(0,humans.size()-1)
 	var closest_cpu_to_human = cpu[target_human].get_closest_attack_cpu()
 	
-	user_attack_ai(target_human, closest_cpu_to_human)	
+	await user_attack_ai(target_human, closest_cpu_to_human)
+	on_user()	
 	
 func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
 	if !closest_cpu_to_human:		
 		return
 	
 	if closest_cpu_to_human.is_in_group("dead"):
-		on_user()
+		on_cpu()
 				
 	if !closest_cpu_to_human.is_in_group("dead"):
 		var closest_atack = cpu[target_human]									
@@ -801,8 +804,9 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					closest_atack.position.y -= 500
 					closest_cpu_to_human.get_child(0).play("default")	
 					break
-									
+								
 			moving = false
+
 		else:
 			user_attack_ai(target_human, closest_cpu_to_human)
 	
