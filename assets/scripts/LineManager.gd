@@ -37,7 +37,7 @@ func _process(_delta):
 
 func _input(event):		
 	if event is InputEventMouseButton:											
-		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
+		if event.button_index == MOUSE_BUTTON_MIDDLE and onTrajectory == false:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
