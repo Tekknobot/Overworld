@@ -20,7 +20,7 @@ var blank = preload("res://assets/scenes/prefab/blank.scn")
 
 var building = preload("res://assets/scenes/prefab/building_c.scn")
 var building2 = preload("res://assets/scenes/prefab/building_c2.scn")
-var tower = preload("res://assets/scenes/prefab/building_c.scn")
+var tower = preload("res://assets/scenes/prefab/building_c3.scn")
 var stadium = preload("res://assets/scenes/prefab/building_c2.scn")
 var district = preload("res://assets/scenes/prefab/building_c.scn")
 
