@@ -350,21 +350,22 @@ func spawn_buildings():
 
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 4:	
-				var tile_pos = Vector2i(i, j)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-				var building_inst = building2.instantiate()
-				building_inst.position = tile_center_pos
-				add_child(building_inst)
-				building_inst.add_to_group("buildings2")		
-				building_inst.z_index = tile_pos.x + tile_pos.y
-				building_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))	
-				building_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
-				var tween: Tween = create_tween()
-				tween.tween_property(building_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
-				#await get_tree().create_timer(0).timeout
-				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
-				progresscount += 1		
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 4:
+				if rng.randi_range(0, 2) == 0:	
+					var tile_pos = Vector2i(i, j)
+					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+					var building_inst = building2.instantiate()
+					building_inst.position = tile_center_pos
+					add_child(building_inst)
+					building_inst.add_to_group("buildings2")		
+					building_inst.z_index = tile_pos.x + tile_pos.y
+					building_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))	
+					building_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
+					var tween: Tween = create_tween()
+					tween.tween_property(building_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
+					#await get_tree().create_timer(0).timeout
+					Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
+					progresscount += 1		
 
 	for i in grid_width:
 		for j in grid_height:
@@ -391,7 +392,7 @@ func spawn_stadiums():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:
-				if rng.randi_range(0, 0) == 0:	
+				if rng.randi_range(0, 2) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var stadium_inst = stadium.instantiate()
@@ -413,7 +414,7 @@ func spawn_districts():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 6:	
-				if rng.randi_range(0, 0) == 0:	
+				if rng.randi_range(0, 2) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var district_inst = district.instantiate()
