@@ -40,6 +40,7 @@ var landmines = []
 var only_once = true
 
 var kill_count = 0
+var coord
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -85,7 +86,7 @@ func _process(_delta):
 		direction = Vector2.LEFT
 		
 	self.tile_pos = get_node("../TileMap").local_to_map(self.position)
-	
+	self.coord = self.tile_pos
 	# Z index layering
 	self.z_index = (tile_pos.x + tile_pos.y) + 1
 	
