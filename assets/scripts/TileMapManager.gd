@@ -93,11 +93,8 @@ func _input(event):
 					if user_units[i].tile_pos == tile_pos:
 						show_movement_range(tile_pos)
 						user_units[i].selected = true
-												
-				for i in user_units.size():
-					if user_units[i].selected == true:
 						selected_unit_num = i
-						selected_pos = user_units[i].tile_pos								
+						selected_pos = user_units[i].tile_pos
 						break
 												
 				#Move unit
@@ -117,6 +114,7 @@ func _input(event):
 					# Move unit		
 					for h in patharray.size():
 						moving = true		
+						
 						user_units[selected_unit_num].get_child(0).play("move")						
 						var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 						var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -127,8 +125,9 @@ func _input(event):
 						user_units[selected_unit_num].get_child(0).play("default")
 						for i in user_units.size():
 							user_units[i].selected = false
+							
 						moving = false											
-										
+															
 func show_path(tile_pos):
 	#Remove hover tiles										
 	for j in grid_height:
