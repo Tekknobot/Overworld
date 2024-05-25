@@ -129,6 +129,12 @@ func get_closest_attack_humans():
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
 		self.get_child(0).play("water")	
-		in_water = true
+		self.in_water = true
 		return true
+		
+func check_land():
+	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) != 0:
+		self.get_child(0).play("default")	
+		self.in_water = false
+		return true		
 	

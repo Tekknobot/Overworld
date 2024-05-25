@@ -1,6 +1,7 @@
 extends TileMap
 
 @export var node2D: Node2D
+@onready var soundstream = $"../SoundStream"
 
 var grid = []
 var grid_width = 64
@@ -109,6 +110,9 @@ func _input(event):
 						user_units[i].selected = true
 						selected_unit_num = i
 						selected_pos = user_units[i].tile_pos
+						
+						soundstream.stream = soundstream.map_sfx[8]
+						soundstream.play()							
 						break
 						
 				# Ranged Attack
@@ -134,8 +138,8 @@ func _input(event):
 												
 						right_clicked_unit.get_child(0).play("attack")	
 						
-						#soundstream.stream = soundstream.map_sfx[7]
-						#soundstream.play()	
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
 												
 						await get_tree().create_timer(0.1).timeout
 						right_clicked_unit.get_child(0).play("default")		
@@ -156,13 +160,15 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							all_units[h].get_child(0).play("death")
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 	
-							#soundstream.stream = soundstream.map_sfx[5]
-							#soundstream.play()															
-
+							all_units[h].remove_from_group("zombies") 															
+							soundstream.stream = soundstream.map_sfx[7]
+							soundstream.play()	
+							
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -172,13 +178,15 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							all_units[h].get_child(0).play("death")
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 																				
-							#soundstream.stream = soundstream.map_sfx[5]
-							#soundstream.play()		
-							
+							all_units[h].remove_from_group("zombies") 																					
+							soundstream.stream = soundstream.map_sfx[7]
+							soundstream.play()	
+														
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -188,13 +196,15 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							all_units[h].get_child(0).play("death")
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()									
 							await get_tree().create_timer(0.5).timeout	
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
-							#soundstream.stream = soundstream.map_sfx[5]
-							#soundstream.play()		
-													
+							soundstream.stream = soundstream.map_sfx[7]
+							soundstream.play()	
+																				
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 							get_node("../TileMap").all_units[h].position = clicked_pos
@@ -204,14 +214,19 @@ func _input(event):
 							var tween: Tween = create_tween()
 							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
 							all_units[h].get_child(0).play("death")
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
 							all_units[h].position.y -= 500		
 							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 							
-							#soundstream.stream = soundstream.map_sfx[5]
-							#soundstream.play()		
+							all_units[h].remove_from_group("zombies") 								
+							soundstream.stream = soundstream.map_sfx[7]
+							soundstream.play()	
+													
+						await get_tree().create_timer(0).timeout	
 						
-						await get_tree().create_timer(1).timeout	
+					if all_units[h].in_water == true:
+						all_units[h].get_child(0).play("water")
 																		
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 7 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true:
@@ -245,8 +260,7 @@ func _input(event):
 							if user_units[selected_unit_num].check_water() == true:
 								pass
 							
-						else:	
-							user_units[selected_unit_num].in_water = false						
+						elif user_units[selected_unit_num].check_land() == true:							
 							user_units[selected_unit_num].get_child(0).play("move")						
 							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -258,10 +272,13 @@ func _input(event):
 							for i in user_units.size():
 								user_units[i].selected = false
 								
-							moving = false										
+							moving = false		
+							soundstream.stream = soundstream.map_sfx[6]
+							soundstream.play()														
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
-			if event.pressed:						
+			if event.pressed:
+				attack_range = false						
 				#Remove hover tiles										
 				for j in grid_height:
 					for k in grid_width:
@@ -274,17 +291,11 @@ func _input(event):
 							
 				for i in user_units.size():
 					if user_units[i].tile_pos == tile_pos:
-						attack_range = !attack_range
 						right_clicked_unit = user_units[i]
 						selected_unit_num = user_units[i].unit_num
-						selected_pos = user_units[i].tile_pos													
-						break
-						
-				if attack_range == false:
-					#Remove hover tiles										
-					for j in grid_height:
-						for k in grid_width:
-							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)							
+						selected_pos = user_units[i].tile_pos	
+						attack_range = true												
+						break	
 						
 				if tile_data is TileData:				
 					for i in user_units.size():
@@ -344,8 +355,8 @@ func _input(event):
 				if tile_pos.y == 15:
 					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
-				#soundstream.stream = soundstream.map_sfx[2]
-				#soundstream.play()
+				soundstream.stream = soundstream.map_sfx[5]
+				soundstream.play()
 														
 func show_path(tile_pos):
 	#Remove hover tiles										
@@ -526,3 +537,9 @@ func SetLinePoints(a: Vector2, b: Vector2):
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 			
 	attack_range = false		
+
+func remove_hover_tiles():
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
