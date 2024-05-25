@@ -350,9 +350,9 @@ func _input(event):
 					set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
 				if tile_pos.y == 0:
 					set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
-				if tile_pos.x == 15:
+				if tile_pos.x == grid_height-1:
 					set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
-				if tile_pos.y == 15:
+				if tile_pos.y == grid_height-1:
 					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
 				soundstream.stream = soundstream.map_sfx[5]

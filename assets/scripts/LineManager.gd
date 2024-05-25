@@ -131,8 +131,8 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 			explosion_instance.position = explosion_pos
 			explosion_instance.z_index = point_pos.x + point_pos.y
 				
-			$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-			$"../AudioStreamPlayer2D".play()	
+			$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
+			$"../SoundStream".play()	
 				
 	for i in 4:
 		line_inst.set_antialiased(false)
@@ -209,8 +209,8 @@ func cpu_attack():
 		#return
 	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
-	$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-	$"../AudioStreamPlayer2D".play()	
+	$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
+	$"../SoundStream".play()	
 	for j in get_node("/root/Node2D").structures.size():
 		if coord_B == get_node("/root/Node2D").structures[j].coord:
 			var tween: Tween = create_tween()
