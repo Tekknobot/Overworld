@@ -20,6 +20,8 @@ var selected_pos = Vector2i(0,0);
 var target_pos = Vector2i(0,0);
 var selected_unit_num = 1
 
+var moving = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
@@ -66,7 +68,7 @@ func _input(event):
 			get_tree().quit()
 					
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true:	
+		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
 				
 				var mouse_pos = get_global_mouse_position()
@@ -99,7 +101,7 @@ func _input(event):
 						break
 												
 				#Move unit
-				if get_cell_source_id(1, tile_pos) == 7 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true :
+				if get_cell_source_id(1, tile_pos) == 7 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true:
 					#Remove hover tiles										
 					for j in grid_height:
 						for k in grid_width:
@@ -113,7 +115,8 @@ func _input(event):
 						set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)	
 											
 					# Move unit		
-					for h in patharray.size():		
+					for h in patharray.size():
+						moving = true		
 						user_units[selected_unit_num].get_child(0).play("move")						
 						var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 						var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -121,7 +124,10 @@ func _input(event):
 						var tween = create_tween()
 						tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
 						await tween.finished
-						user_units[selected_unit_num].get_child(0).play("default")										
+						user_units[selected_unit_num].get_child(0).play("default")
+						for i in user_units.size():
+							user_units[i].selected = false
+						moving = false											
 										
 func show_path(tile_pos):
 	#Remove hover tiles										
