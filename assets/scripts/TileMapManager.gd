@@ -91,7 +91,8 @@ func _input(event):
 				
 				for i in user_units.size():
 					if user_units[i].tile_pos == tile_pos:
-						show_movement_range(tile_pos)
+						#show_movement_range(tile_pos)
+						show_full_range()
 						user_units[i].selected = true
 						selected_unit_num = i
 						selected_pos = user_units[i].tile_pos
@@ -114,20 +115,35 @@ func _input(event):
 					# Move unit		
 					for h in patharray.size():
 						moving = true		
-						
-						user_units[selected_unit_num].get_child(0).play("move")						
-						var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
-						var unit_pos = local_to_map(user_units[selected_unit_num].position)
-						user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
-						var tween = create_tween()
-						tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
-						await tween.finished
-						user_units[selected_unit_num].get_child(0).play("default")
-						for i in user_units.size():
-							user_units[i].selected = false
+						if user_units[selected_unit_num].check_water() == true:
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(user_units[selected_unit_num].position)
+							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
+							await tween.finished
+							user_units[selected_unit_num].get_child(0).play("default")
+							for i in user_units.size():
+								user_units[i].selected = false
+								
+							moving = false	
+							if user_units[selected_unit_num].check_water() == true:
+								pass
 							
-						moving = false											
-															
+						else:							
+							user_units[selected_unit_num].get_child(0).play("move")						
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(user_units[selected_unit_num].position)
+							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
+							await tween.finished
+							user_units[selected_unit_num].get_child(0).play("default")
+							for i in user_units.size():
+								user_units[i].selected = false
+								
+							moving = false											
+														
 func show_path(tile_pos):
 	#Remove hover tiles										
 	for j in grid_height:
@@ -264,3 +280,9 @@ func show_movement_range(tile_pos: Vector2i):
 	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-3), 7, Vector2i(0, 0), 0)															
 	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y-2), 7, Vector2i(0, 0), 0)																																								
 	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+3), 7, Vector2i(0, 0), 0)
+
+func show_full_range():
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), 7, Vector2i(0, 0), 0)	

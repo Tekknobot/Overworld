@@ -63,6 +63,9 @@ func _ready():
 	old_pos = global_position;
 	pos = global_position;
 	
+	await get_tree().create_timer(1).timeout
+	check_water()
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	#set pos to current position
@@ -87,6 +90,7 @@ func _process(_delta):
 		
 	self.tile_pos = get_node("../TileMap").local_to_map(self.position)
 	self.coord = self.tile_pos
+
 	# Z index layering
 	self.z_index = (tile_pos.x + tile_pos.y) + 1
 	
@@ -119,3 +123,8 @@ func get_closest_attack_humans():
 	return closest_player
 
 
+func check_water():
+	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
+		self.get_child(0).play("water")	
+		return true
+	

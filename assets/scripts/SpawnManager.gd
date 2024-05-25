@@ -29,14 +29,14 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) != 0 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) == 0 or get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) == 3 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
 	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop soldier at start	
-	for i in 128:	
+	for i in 64:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("humans")			
