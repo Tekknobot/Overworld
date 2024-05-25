@@ -125,6 +125,19 @@ func get_closest_attack_humans():
 				
 	return closest_player
 
+func get_closest_attack_cpu():
+	var all_players = get_tree().get_nodes_in_group("cpu")
+	var closest_player = null
+ 
+	if (all_players.size() > 0):
+		closest_player = all_players[0]
+		for player in all_players:
+			var distance_to_this_player = global_position.distance_squared_to(player.global_position)	
+			var distance_to_closest_player = global_position.distance_squared_to(closest_player.global_position)
+			if (distance_to_this_player < distance_to_closest_player):
+				closest_player = player
+				
+	return closest_player
 
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:

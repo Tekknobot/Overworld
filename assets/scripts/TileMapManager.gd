@@ -76,8 +76,10 @@ func _input(event):
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 		if event.pressed and event.keycode == KEY_2:
-			pass
-						
+			on_user()
+		if event.pressed and event.keycode == KEY_3:
+			on_cpu()
+									
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
@@ -543,3 +545,264 @@ func remove_hover_tiles():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+
+func on_user():
+	humans = get_tree().get_nodes_in_group("humans")
+	cpu = get_tree().get_nodes_in_group("cpu")
+	
+	all_units.append_array(humans)	
+	all_units.append_array(cpu)		
+	user_units.append_array(humans)
+	cpu_units.append_array(cpu)		
+	
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	moving = false		
+	
+	if cpu.size() == 0:
+		return
+	var target_human = rng.randi_range(0,humans.size()-1)
+	var closest_cpu_to_human = cpu[target_human].get_closest_attack_humans()
+	
+	user_attack_ai(target_human, closest_cpu_to_human)	
+	
+func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
+	if !closest_cpu_to_human:		
+		return
+	
+	if closest_cpu_to_human.is_in_group("dead"):
+		on_user()
+				
+	if !closest_cpu_to_human.is_in_group("dead"):
+		var closest_atack = cpu[target_human]									
+		var cpu_target_pos = local_to_map(closest_atack.position)
+		var cpu_surrounding_cells = get_surrounding_cells(cpu_target_pos)
+		
+		closest_cpu_to_human.get_child(0).play("move")
+		var open_tile = rng.randi_range(0,3)
+		if astar_grid.is_point_solid(cpu_surrounding_cells[open_tile]) == false and get_cell_source_id(0, cpu_surrounding_cells[open_tile]) != -1: 
+			
+			var patharray = astar_grid.get_point_path(closest_cpu_to_human.tile_pos, cpu_surrounding_cells[open_tile])
+			# Find path and set hover cells
+			for h in patharray.size():
+				await get_tree().create_timer(0.01).timeout
+				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
+				if h == closest_cpu_to_human.unit_movement:
+					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
+				
+			# Move unit		
+			for h in patharray.size():
+				moving = true		
+				if closest_cpu_to_human.check_water() == true:
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(closest_cpu_to_human.position)
+					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					await tween.finished
+					closest_cpu_to_human.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false	
+					if closest_cpu_to_human.check_water() == true:
+						pass
+					
+				elif closest_cpu_to_human.check_land() == true:							
+					closest_cpu_to_human.get_child(0).play("move")						
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(closest_cpu_to_human.position)
+					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					await tween.finished
+					closest_cpu_to_human.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false		
+					soundstream.stream = soundstream.map_sfx[6]
+					soundstream.play()						
+				
+				if h == closest_cpu_to_human.unit_movement:
+					break	
+					
+			moving = false
+							
+			# Remove hover cells
+			for h in patharray.size():
+				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
+			
+			closest_cpu_to_human.get_child(0).play("default")	
+			
+			for i in 4:
+				var cpu_pos = local_to_map(closest_cpu_to_human.position)
+				if cpu_pos == cpu_surrounding_cells[i]:
+					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
+								
+					if closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x > attack_center_position.x:
+						closest_cpu_to_human.scale.x = 1
+					elif closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x < attack_center_position.x:
+						closest_cpu_to_human.scale.x = -1	
+					if closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x > attack_center_position.x:
+						closest_cpu_to_human.scale.x = 1
+					elif closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x < attack_center_position.x:
+						closest_cpu_to_human.scale.x = -1						
+		
+
+					closest_cpu_to_human.get_child(0).play("attack")
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
+					
+					soundstream.stream = soundstream.map_sfx[4]
+					soundstream.play()							
+						
+					await get_tree().create_timer(1).timeout
+					closest_atack.get_child(0).play("death")	
+					
+					soundstream.stream = soundstream.map_sfx[8]
+					soundstream.play()		
+									
+					await get_tree().create_timer(1).timeout
+					closest_atack.add_to_group("humans dead")
+					closest_atack.position.y -= 500
+					closest_cpu_to_human.get_child(0).play("default")	
+					break
+									
+			moving = false
+		else:
+			user_attack_ai(target_human, closest_cpu_to_human)
+	
+func on_cpu():
+	cpu = get_tree().get_nodes_in_group("humans")
+	humans = get_tree().get_nodes_in_group("cpu")
+	
+	all_units.append_array(humans)	
+	all_units.append_array(cpu)		
+	user_units.append_array(humans)
+	cpu_units.append_array(cpu)		
+	
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	moving = false		
+	
+	if cpu.size() == 0:
+		return
+	var target_human = rng.randi_range(0,humans.size()-1)
+	var closest_cpu_to_human = cpu[target_human].get_closest_attack_cpu()
+	
+	user_attack_ai(target_human, closest_cpu_to_human)	
+	
+func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
+	if !closest_cpu_to_human:		
+		return
+	
+	if closest_cpu_to_human.is_in_group("dead"):
+		on_user()
+				
+	if !closest_cpu_to_human.is_in_group("dead"):
+		var closest_atack = cpu[target_human]									
+		var cpu_target_pos = local_to_map(closest_atack.position)
+		var cpu_surrounding_cells = get_surrounding_cells(cpu_target_pos)
+		
+		closest_cpu_to_human.get_child(0).play("move")
+		var open_tile = rng.randi_range(0,3)
+		if astar_grid.is_point_solid(cpu_surrounding_cells[open_tile]) == false and get_cell_source_id(0, cpu_surrounding_cells[open_tile]) != -1: 
+			
+			var patharray = astar_grid.get_point_path(closest_cpu_to_human.tile_pos, cpu_surrounding_cells[open_tile])
+			# Find path and set hover cells
+			for h in patharray.size():
+				await get_tree().create_timer(0.01).timeout
+				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
+				if h == closest_cpu_to_human.unit_movement:
+					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
+				
+			# Move unit		
+			for h in patharray.size():
+				moving = true		
+				if closest_cpu_to_human.check_water() == true:
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(closest_cpu_to_human.position)
+					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					await tween.finished
+					closest_cpu_to_human.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false	
+					if closest_cpu_to_human.check_water() == true:
+						pass
+					
+				elif closest_cpu_to_human.check_land() == true:							
+					closest_cpu_to_human.get_child(0).play("move")						
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(closest_cpu_to_human.position)
+					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					await tween.finished
+					closest_cpu_to_human.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false		
+					soundstream.stream = soundstream.map_sfx[6]
+					soundstream.play()						
+				
+				if h == closest_cpu_to_human.unit_movement:
+					break	
+					
+			moving = false
+							
+			# Remove hover cells
+			for h in patharray.size():
+				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
+			
+			closest_cpu_to_human.get_child(0).play("default")	
+			
+			for i in 4:
+				var cpu_pos = local_to_map(closest_cpu_to_human.position)
+				if cpu_pos == cpu_surrounding_cells[i]:
+					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
+								
+					if closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x > attack_center_position.x:
+						closest_cpu_to_human.scale.x = 1
+					elif closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x < attack_center_position.x:
+						closest_cpu_to_human.scale.x = -1	
+					if closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x > attack_center_position.x:
+						closest_cpu_to_human.scale.x = 1
+					elif closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x < attack_center_position.x:
+						closest_cpu_to_human.scale.x = -1						
+		
+
+					closest_cpu_to_human.get_child(0).play("attack")
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
+					
+					soundstream.stream = soundstream.map_sfx[4]
+					soundstream.play()							
+						
+					await get_tree().create_timer(1).timeout
+					closest_atack.get_child(0).play("death")	
+					
+					soundstream.stream = soundstream.map_sfx[8]
+					soundstream.play()		
+									
+					await get_tree().create_timer(1).timeout
+					closest_atack.add_to_group("humans dead")
+					closest_atack.position.y -= 500
+					closest_cpu_to_human.get_child(0).play("default")	
+					break
+									
+			moving = false
+		else:
+			user_attack_ai(target_human, closest_cpu_to_human)
+	
