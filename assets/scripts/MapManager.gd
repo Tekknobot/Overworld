@@ -20,9 +20,9 @@ var blank = preload("res://assets/scenes/prefab/blank.scn")
 
 var building = preload("res://assets/scenes/prefab/building_c.scn")
 var building2 = preload("res://assets/scenes/prefab/building_c2.scn")
-var tower = preload("res://assets/scenes/prefab/tower.scn")
-var stadium = preload("res://assets/scenes/prefab/stadium.scn")
-var district = preload("res://assets/scenes/prefab/district.scn")
+var tower = preload("res://assets/scenes/prefab/building_c.scn")
+var stadium = preload("res://assets/scenes/prefab/building_c2.scn")
+var district = preload("res://assets/scenes/prefab/building_c.scn")
 
 var map_pos = Vector2(0,0)
 var road_pos = Vector2(0,0)
@@ -90,7 +90,7 @@ func move(dir):
 func generate_tile(cell):
 		var _cells = find_valid_tiles(cell)
 		#check for water
-		if Map.get_cell_source_id(0, map_pos) == 0:
+		if Map.get_cell_source_id(0, map_pos) == 0 or Map.get_cell_source_id(0, map_pos) == 1:
 			return
 		Map.set_cell(0, map_pos, tile_id, Vector2i(0, 0), 0)	
 		
@@ -331,21 +331,22 @@ func spawn_structures(): #useless
 func spawn_buildings():
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 1:	
-				var tile_pos = Vector2i(i, j)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-				var building_inst = building.instantiate()
-				building_inst.position = tile_center_pos
-				add_child(building_inst)
-				building_inst.add_to_group("buildings")		
-				building_inst.z_index = tile_pos.x + tile_pos.y
-				building_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))	
-				building_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
-				var tween: Tween = create_tween()
-				tween.tween_property(building_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
-				#await get_tree().create_timer(0).timeout
-				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
-				progresscount += 1					
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 1:
+				if rng.randi_range(0, 1) == 0:	
+					var tile_pos = Vector2i(i, j)
+					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+					var building_inst = building.instantiate()
+					building_inst.position = tile_center_pos
+					add_child(building_inst)
+					building_inst.add_to_group("buildings")		
+					building_inst.z_index = tile_pos.x + tile_pos.y
+					building_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))	
+					building_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
+					var tween: Tween = create_tween()
+					tween.tween_property(building_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
+					#await get_tree().create_timer(0).timeout
+					Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
+					progresscount += 1					
 
 	for i in grid_width:
 		for j in grid_height:
@@ -364,48 +365,69 @@ func spawn_buildings():
 				#await get_tree().create_timer(0).timeout
 				Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
 				progresscount += 1		
+
+	for i in grid_width:
+		for j in grid_height:
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:	
+				if rng.randi_range(0, 9) == 0:
+					var tile_pos = Vector2i(i, j)
+					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+					var building_inst = building.instantiate()
+					building_inst.position = tile_center_pos
+					add_child(building_inst)
+					building_inst.add_to_group("buildings")		
+					building_inst.z_index = tile_pos.x + tile_pos.y
+					building_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))	
+					building_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
+					var tween: Tween = create_tween()
+					tween.tween_property(building_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
+					#await get_tree().create_timer(0).timeout
+					Map.set_cell(0, Vector2i(i, j), 9, Vector2i(0, 0), 0)
+					progresscount += 1	
 					
 	spawn_stadiums()	
 				
 func spawn_stadiums():
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:	
-				var tile_pos = Vector2i(i, j)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-				var stadium_inst = stadium.instantiate()
-				stadium_inst.position = tile_center_pos
-				add_child(stadium_inst)	
-				stadium_inst.add_to_group("stadiums")	
-				stadium_inst.z_index = tile_pos.x + tile_pos.y
-				stadium_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
-				stadium_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
-				var tween: Tween = create_tween()
-				tween.tween_property(stadium_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
-				#await get_tree().create_timer(0).timeout
-				Map.set_cell(0, Vector2i(i, j), 10, Vector2i(0, 0), 0)
-				progresscount += 1
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:
+				if rng.randi_range(0, 0) == 0:	
+					var tile_pos = Vector2i(i, j)
+					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+					var stadium_inst = stadium.instantiate()
+					stadium_inst.position = tile_center_pos
+					add_child(stadium_inst)	
+					stadium_inst.add_to_group("stadiums")	
+					stadium_inst.z_index = tile_pos.x + tile_pos.y
+					stadium_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
+					stadium_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
+					var tween: Tween = create_tween()
+					tween.tween_property(stadium_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
+					#await get_tree().create_timer(0).timeout
+					Map.set_cell(0, Vector2i(i, j), 10, Vector2i(0, 0), 0)
+					progresscount += 1
 		
 	spawn_districts()
 	
 func spawn_districts():
 	for i in grid_width:
 		for j in grid_height:
-			if Map.get_cell_source_id(0, Vector2i(i,j)) == 6:		
-				var tile_pos = Vector2i(i, j)
-				var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-				var district_inst = district.instantiate()
-				district_inst.position = tile_center_pos
-				add_child(district_inst)
-				district_inst.add_to_group("districts")		
-				district_inst.z_index = tile_pos.x + tile_pos.y				
-				district_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
-				district_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
-				var tween: Tween = create_tween()
-				tween.tween_property(district_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
-				#await get_tree().create_timer(0).timeout
-				Map.set_cell(0, Vector2i(i, j), 11, Vector2i(0, 0), 0)
-				progresscount += 1
+			if Map.get_cell_source_id(0, Vector2i(i,j)) == 6:	
+				if rng.randi_range(0, 0) == 0:	
+					var tile_pos = Vector2i(i, j)
+					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+					var district_inst = district.instantiate()
+					district_inst.position = tile_center_pos
+					add_child(district_inst)
+					district_inst.add_to_group("districts")		
+					district_inst.z_index = tile_pos.x + tile_pos.y				
+					district_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
+					district_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)						
+					var tween: Tween = create_tween()
+					tween.tween_property(district_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)				
+					#await get_tree().create_timer(0).timeout
+					Map.set_cell(0, Vector2i(i, j), 11, Vector2i(0, 0), 0)
+					progresscount += 1
 	
 	spawn_towers_final()
 	
@@ -420,19 +442,20 @@ func spawn_towers_final():
 				progresscount += 1	
 								
 	for l in tower_coord.size():	
-		var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
-		var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
-		var tower_inst = tower.instantiate()
-		tower_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)
-		var tween: Tween = create_tween()
-		tween.tween_property(tower_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)								
-		add_child(tower_inst)	
-		tower_inst.add_to_group("towers")	
-		tower_inst.z_index = tile_pos.x + tile_pos.y
-		tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
-		Map.set_cell(0, tile_pos, 9, Vector2i(0, 0), 0)
-		progresscount += 1						
-		#await get_tree().create_timer(0).timeout				
+		if rng.randi_range(0, 0) == 0:
+			var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
+			var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
+			var tower_inst = tower.instantiate()
+			tower_inst.position = Vector2(tile_center_pos.x, tile_center_pos.y-500)
+			var tween: Tween = create_tween()
+			tween.tween_property(tower_inst, "position", tile_center_pos, 0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)								
+			add_child(tower_inst)	
+			tower_inst.add_to_group("towers")	
+			tower_inst.z_index = tile_pos.x + tile_pos.y
+			tower_inst.get_child(0).modulate = Color8(rng.randi_range(150, 255), rng.randi_range(150, 255), rng.randi_range(150, 255))		
+			Map.set_cell(0, tile_pos, 9, Vector2i(0, 0), 0)
+			progresscount += 1						
+			#await get_tree().create_timer(0).timeout				
 								
 	add_to_structures_array()
 	
