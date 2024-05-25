@@ -26,6 +26,9 @@ var moving = false
 
 var right_clicked_unit
 var left_clicked_unit
+var attack_range = false
+
+var _temp
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -77,10 +80,10 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
-				
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
-				var tile_pos = local_to_map(mouse_pos)	
+				var tile_pos = local_to_map(mouse_pos)
+				var mouse_position = map_to_local(tile_pos) + Vector2(0,0) / 2	
 				#var tile_data = get_cell_tile_data(0, tile_pos)
 
 				clicked_pos = tile_pos	
@@ -92,7 +95,7 @@ func _input(event):
 				all_units.append_array(cpu)		
 				user_units.append_array(humans)
 				cpu_units.append_array(cpu)	
-				
+					
 				# Return if clicked on struture
 				for i in node2D.structures.size():
 					var tile_center_pos = map_to_local(tile_pos) + Vector2(0,0) / 2
@@ -100,9 +103,9 @@ func _input(event):
 						return					
 				
 				for i in user_units.size():
-					if user_units[i].tile_pos == tile_pos:
-						#show_movement_range(tile_pos)
-						show_full_range()
+					if user_units[i].tile_pos == tile_pos and attack_range == false:
+						show_movement_range(tile_pos)
+						#show_full_range()
 						user_units[i].selected = true
 						selected_unit_num = i
 						selected_pos = user_units[i].tile_pos
@@ -114,12 +117,7 @@ func _input(event):
 					left_clicked_unit = all_units[h]
 					
 					#Butch Projectile shoot	
-					if mouse_pos == all_units[h].position and all_units[h].unit_team != 1 and get_cell_source_id(1, tile_pos) == 14:
-						
-						if right_clicked_unit.unit_team == 1:
-							right_clicked_unit.attacked = true
-							right_clicked_unit.moved = true
-						
+					if mouse_position == all_units[h].position and get_cell_source_id(1, tile_pos) == 14 and attack_range == true:
 						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
 						
 						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
@@ -247,7 +245,8 @@ func _input(event):
 							if user_units[selected_unit_num].check_water() == true:
 								pass
 							
-						else:							
+						else:	
+							user_units[selected_unit_num].in_water = false						
 							user_units[selected_unit_num].get_child(0).play("move")						
 							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
@@ -259,26 +258,34 @@ func _input(event):
 							for i in user_units.size():
 								user_units[i].selected = false
 								
-							moving = false											
+							moving = false										
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:						
 				#Remove hover tiles										
 				for j in grid_height:
 					for k in grid_width:
-						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
-																				
+						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+																									
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
 				var tile_pos = local_to_map(mouse_pos)		
 				var tile_data = get_cell_tile_data(0, tile_pos)
-
+							
 				for i in user_units.size():
 					if user_units[i].tile_pos == tile_pos:
+						attack_range = !attack_range
+						right_clicked_unit = user_units[i]
 						selected_unit_num = user_units[i].unit_num
-						selected_pos = user_units[i].tile_pos								
+						selected_pos = user_units[i].tile_pos													
 						break
-
+						
+				if attack_range == false:
+					#Remove hover tiles										
+					for j in grid_height:
+						for k in grid_width:
+							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)							
+						
 				if tile_data is TileData:				
 					for i in user_units.size():
 						var unit_pos = local_to_map(user_units[i].position)
@@ -338,7 +345,7 @@ func _input(event):
 					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
 				#soundstream.stream = soundstream.map_sfx[2]
-				#soundstream.play()	
+				#soundstream.play()
 														
 func show_path(tile_pos):
 	#Remove hover tiles										
@@ -484,17 +491,25 @@ func show_full_range():
 			set_cell(1, Vector2i(j,k), 7, Vector2i(0, 0), 0)	
 
 func SetLinePoints(a: Vector2, b: Vector2):
-	get_node("../Seeker").show()
 	var _a = get_node("../TileMap").local_to_map(a)
 	var _b = get_node("../TileMap").local_to_map(b)		
-	
-	get_node("../Seeker").position = a
-	get_node("../Seeker").z_index = get_node("../Seeker").position.x + get_node("../Seeker").position.y
+
+	var projectile = preload("res://assets/scenes/vfx/explosion.scn")
+	var projectile_instance = projectile.instantiate()
+	var projectile_position = get_node("../TileMap").map_to_local(_a) + Vector2(0,0) / 2
+	projectile_instance.set_name("explosion")
+	get_parent().add_child(projectile_instance)
+	projectile_instance.position = projectile_position	
+	projectile_instance.position.y -= 16
+	projectile_instance.z_index = (_b.x + _b.y) + 1
+		
+	projectile_instance.position = a
+	projectile_instance.z_index = projectile_instance.position.x + projectile_instance.position.y
 	var tween: Tween = create_tween()
-	tween.tween_property(get_node("../Seeker"), "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+	tween.tween_property(projectile_instance, "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
 	await get_tree().create_timer(1).timeout	
 
-	get_node("../Seeker").hide()		
+	projectile_instance.queue_free()		
 
 	var explosion = preload("res://assets/scenes/vfx/explosion.scn")
 	var explosion_instance = explosion.instantiate()
@@ -509,3 +524,5 @@ func SetLinePoints(a: Vector2, b: Vector2):
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+			
+	attack_range = false		

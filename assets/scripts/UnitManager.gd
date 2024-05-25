@@ -42,6 +42,9 @@ var only_once = true
 var kill_count = 0
 var coord
 
+var in_water = false
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	zombies = get_tree().get_nodes_in_group("zombies")
@@ -126,5 +129,6 @@ func get_closest_attack_humans():
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
 		self.get_child(0).play("water")	
+		in_water = true
 		return true
 	
