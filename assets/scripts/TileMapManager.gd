@@ -76,9 +76,7 @@ func _input(event):
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 		if event.pressed and event.keycode == KEY_2:
-			on_user()
-		if event.pressed and event.keycode == KEY_3:
-			on_cpu()		
+			on_user()	
 						
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -165,7 +163,7 @@ func _input(event):
 							soundstream.stream = soundstream.map_sfx[1]
 							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 500		
+							all_units[h].position.y -= 1500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 															
 							soundstream.stream = soundstream.map_sfx[7]
@@ -183,7 +181,7 @@ func _input(event):
 							soundstream.stream = soundstream.map_sfx[1]
 							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 500		
+							all_units[h].position.y -= 1500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 																					
 							soundstream.stream = soundstream.map_sfx[7]
@@ -201,7 +199,7 @@ func _input(event):
 							soundstream.stream = soundstream.map_sfx[1]
 							soundstream.play()									
 							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 500		
+							all_units[h].position.y -= 1500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
 							soundstream.stream = soundstream.map_sfx[7]
@@ -219,7 +217,7 @@ func _input(event):
 							soundstream.stream = soundstream.map_sfx[1]
 							soundstream.play()								
 							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 500		
+							all_units[h].position.y -= 1500		
 							all_units[h].add_to_group("dead") 
 							all_units[h].remove_from_group("zombies") 								
 							soundstream.stream = soundstream.map_sfx[7]
@@ -568,7 +566,7 @@ func on_user():
 	var closest_cpu_to_human = cpu[target_human].get_closest_attack_humans()
 	
 	await user_attack_ai(target_human, closest_cpu_to_human)	
-	on_cpu()
+	await on_cpu()
 	
 func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
 	if !closest_cpu_to_human:		
@@ -609,8 +607,6 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 						user_units[i].selected = false
 						
 					moving = false	
-					if closest_cpu_to_human.check_water() == true:
-						pass
 					
 				elif closest_cpu_to_human.check_land() == true:							
 					closest_cpu_to_human.get_child(0).play("move")						
@@ -625,12 +621,13 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 						user_units[i].selected = false
 						
 					moving = false		
+						
 					soundstream.stream = soundstream.map_sfx[6]
 					soundstream.play()						
 				
 				if h == closest_cpu_to_human.unit_movement:
 					break	
-					
+									
 			moving = false
 							
 			# Remove hover cells
@@ -664,17 +661,18 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
 					
-					soundstream.stream = soundstream.map_sfx[8]
+					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("humans dead")
-					closest_atack.position.y -= 500
+					closest_atack.position.y -= 1500
 					closest_cpu_to_human.get_child(0).play("default")	
 					break
 									
 			moving = false
-
+			closest_cpu_to_human.check_land()
+			closest_cpu_to_human.check_water()	
 		else:
 			user_attack_ai(target_human, closest_cpu_to_human)
 	
@@ -700,7 +698,7 @@ func on_cpu():
 	var closest_cpu_to_human = cpu[target_human].get_closest_attack_cpu()
 	
 	await user_attack_ai(target_human, closest_cpu_to_human)
-	on_user()	
+	await on_user()	
 	
 func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
 	if !closest_cpu_to_human:		
@@ -762,7 +760,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 				
 				if h == closest_cpu_to_human.unit_movement:
 					break	
-					
+				
 			moving = false
 							
 			# Remove hover cells
@@ -796,17 +794,18 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					await get_tree().create_timer(1).timeout
 					closest_atack.get_child(0).play("death")	
 					
-					soundstream.stream = soundstream.map_sfx[8]
+					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("humans dead")
-					closest_atack.position.y -= 500
+					closest_atack.position.y -= 1500
 					closest_cpu_to_human.get_child(0).play("default")	
 					break
 								
 			moving = false
-
+			closest_cpu_to_human.check_land()
+			closest_cpu_to_human.check_water()	
 		else:
 			user_attack_ai(target_human, closest_cpu_to_human)
 	
