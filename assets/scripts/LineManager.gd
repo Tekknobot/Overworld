@@ -221,7 +221,7 @@ func cpu_attack():
 	dup_cpu.queue_free()								
 
 func choose_random_point():
-	var rand = rng.randi_range(0,3)
+	var rand = rng.randi_range(0,2)
 	if rand == 0:
 		_the_point = point1
 	if rand == 1:
@@ -235,4 +235,5 @@ func choose_random_point():
 
 
 func _on_timer_timeout():
-	cpu_attack()
+	#cpu_attack()
+	pass
