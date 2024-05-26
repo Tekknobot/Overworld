@@ -76,9 +76,7 @@ func _input(event):
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 		if event.pressed and event.keycode == KEY_2:
-			on_user()	
-		if event.pressed and event.keycode == KEY_3:
-			on_cpu()
+			cpu_mode()
 									
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -570,7 +568,6 @@ func on_user():
 	await user_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
 	await user_attack_ai(target_human, closest_cpu_to_human)
-	await on_cpu()
 
 func user_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
@@ -1106,7 +1103,6 @@ func on_cpu():
 	await cpu_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
 	await cpu_attack_ai(target_human, closest_cpu_to_human)
-	await on_user()
 
 func cpu_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
@@ -1617,4 +1613,12 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 		else:
 			var target_human_2 = rng.randi_range(0,cpu.size()-1)
 			user_attack_ai(target_human_2, closest_cpu_to_human)
-		
+
+func user_mode():
+	await on_user()
+	cpu_mode()
+	
+func cpu_mode():
+	await on_cpu()	
+	user_mode()
+			
