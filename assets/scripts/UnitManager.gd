@@ -111,8 +111,6 @@ func _process(_delta):
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
 
-	check_water()
-
 func get_closest_attack_humans():
 	var all_players = get_tree().get_nodes_in_group("humans")
 	var closest_player = null

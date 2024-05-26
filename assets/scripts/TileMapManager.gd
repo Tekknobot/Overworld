@@ -286,7 +286,7 @@ func _input(event):
 					for h in patharray.size():
 						moving = true		
 						if user_units[selected_unit_num].check_water() == true:
-							user_units[selected_unit_num].get_child(0).play("move")
+							#user_units[selected_unit_num].get_child(0).play("move")
 							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
@@ -556,7 +556,7 @@ func SetLinePoints(a: Vector2, b: Vector2):
 	get_parent().add_child(projectile_instance)
 	projectile_instance.position = projectile_position	
 	projectile_instance.position.y -= 16
-	projectile_instance.z_index = (_b.x + _b.y) + 1
+	projectile_instance.z_index = (_a.x + _a.y) + 1
 		
 	projectile_instance.position = a
 	projectile_instance.z_index = projectile_instance.position.x + projectile_instance.position.y
@@ -676,7 +676,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -735,7 +735,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-																												
+			user_units[i].check_water()																									
 			var hoverflag_2 = true										
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
@@ -772,7 +772,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -831,7 +831,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-
+			user_units[i].check_water()
 			var hoverflag_3 = true	
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
@@ -868,7 +868,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -928,7 +928,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-
+			user_units[i].check_water()
 			var hoverflag_4 = true	
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
@@ -965,7 +965,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -1024,6 +1024,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
+			user_units[i].check_water()
 				
 	if tile_pos.x == 0:
 		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
@@ -1231,7 +1232,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -1323,7 +1324,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -1415,7 +1416,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
@@ -1508,7 +1509,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 									var _bumpedvector = cpu_units[l].tile_pos
 									var right_clicked_pos = local_to_map(user_units[i].position)
 																		 	
-									await SetLinePoints(cpu_units[l].position, closest)
+									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
 									
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
