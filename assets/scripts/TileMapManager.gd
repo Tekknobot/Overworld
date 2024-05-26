@@ -71,12 +71,41 @@ func _process(_delta):
 		for i in grid_width:
 			set_cell(1, Vector2i(h+grid_height, i+grid_height), -1, Vector2i(0, 0), 0)
 	
+	# Layer 2
+	#Remove tiles that are off map
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(-grid_height+h, i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(grid_height+h, i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(h, -grid_height+i), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(h, grid_height+i), -1, Vector2i(0, 0), 0)
+	
+	#Remove tiles that are on the corner grids off map
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(-h-1, -i-1), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(h+grid_height, -i-1), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(-h-1, i+grid_height), -1, Vector2i(0, 0), 0)
+	for h in grid_height:
+		for i in grid_width:
+			set_cell(2, Vector2i(h+grid_height, i+grid_height), -1, Vector2i(0, 0), 0)
+				
 func _input(event):
 	if event is InputEventKey:	
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 		if event.pressed and event.keycode == KEY_2:
-			on_user()
+			cpu_mode()
 									
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -383,59 +412,59 @@ func show_attack_range(tile_pos: Vector2i):
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+			set_cell(2, Vector2i(j,k), -1, Vector2i(0, 0), 0)
 	
 	#Place hover tiles		
 	var surrounding_cells = get_node("../TileMap").get_surrounding_cells(tile_pos)
 	
 	for k in surrounding_cells.size():
-		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)									
+		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)									
 		if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
-			set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-			set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+			set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+			set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
 	for k in surrounding_cells.size():
-		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
+		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(2, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
 	for k in surrounding_cells.size():
-		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
+		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(2, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
 	for k in surrounding_cells.size():
-		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(1, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
+		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(2, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
 	for k in surrounding_cells.size():
-		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(1, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
-		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
+		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(2, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
+		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
 											
-	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
-	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
 
-	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
-	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
 
-	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
-	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
+	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
+	set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
 
 func show_movement_range(tile_pos: Vector2i):
 	#Remove hover tiles										
@@ -1039,24 +1068,24 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 			for h in patharray.size():
 				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
 			
-			closest_cpu_to_human.get_child(0).play("default")	
+			active_unit.get_child(0).play("default")	
 			
 			for i in 4:
-				var cpu_pos = local_to_map(closest_cpu_to_human.position)
+				var cpu_pos = local_to_map(active_unit.position)
 				if cpu_pos == cpu_surrounding_cells[i]:
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
-					if closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x > attack_center_position.x:
-						closest_cpu_to_human.scale.x = 1
-					elif closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x < attack_center_position.x:
-						closest_cpu_to_human.scale.x = -1	
-					if closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x > attack_center_position.x:
-						closest_cpu_to_human.scale.x = 1
-					elif closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x < attack_center_position.x:
-						closest_cpu_to_human.scale.x = -1						
+					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
+						active_unit.scale.x = 1
+					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
+						active_unit.scale.x = -1	
+					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
+						active_unit.scale.x = 1
+					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
+						active_unit.scale.x = -1						
 		
 
-					closest_cpu_to_human.get_child(0).play("attack")
+					active_unit.get_child(0).play("attack")
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
 					
@@ -1072,14 +1101,17 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("humans dead")
 					closest_atack.position.y -= 1500
-					closest_cpu_to_human.get_child(0).play("default")	
+					active_unit.get_child(0).play("default")	
 					break
 									
 			moving = false
-			closest_cpu_to_human.check_land()
-			closest_cpu_to_human.check_water()	
+			active_unit.check_land()
+			active_unit.check_water()	
 		else:
-			on_user()
+			active_unit.check_land()
+			active_unit.check_water()
+			active_unit.get_child(0).play("default")				
+			#on_user()
 			
 func on_cpu():
 	cpu = get_tree().get_nodes_in_group("humans")
@@ -1087,8 +1119,8 @@ func on_cpu():
 	
 	all_units.append_array(humans)	
 	all_units.append_array(cpu)		
-	user_units.append_array(humans)
-	cpu_units.append_array(cpu)		
+	user_units.append_array(cpu)
+	cpu_units.append_array(humans)		
 	
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1100,11 +1132,12 @@ func on_cpu():
 	if cpu.size() == 0:
 		return
 	var target_human = rng.randi_range(0,cpu.size()-1)
-	var closest_cpu_to_human = humans[target_human].get_closest_attack_cpu()
+	var closest_cpu_to_human = humans[target_human].get_closest_attack_humans()
+	var active_unit = humans[target_human]
 	
-	await cpu_range_ai(closest_cpu_to_human.tile_pos)
+	await user_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
-	await cpu_attack_ai(target_human, closest_cpu_to_human)
+	await user_attack_ai(target_human, closest_cpu_to_human, active_unit)
 
 func cpu_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
@@ -1507,55 +1540,57 @@ func cpu_range_ai(closest_cpu_to_human: Vector2i):
 	soundstream.stream = soundstream.map_sfx[5]
 	soundstream.play() 
 	
-func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):	
+func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):	
 	if !closest_cpu_to_human:		
 		return
 	
 	if closest_cpu_to_human.is_in_group("dead"):
 		on_user()
+		return
 				
 	if !closest_cpu_to_human.is_in_group("dead"):
-		var closest_atack = closest_cpu_to_human
+		var closest_atack = closest_cpu_to_human							
 		var cpu_target_pos = local_to_map(closest_atack.position)
 		var cpu_surrounding_cells = get_surrounding_cells(cpu_target_pos)
+		var active_pos = local_to_map(active_unit.position)
 		
-		closest_cpu_to_human.get_child(0).play("move")
+		active_unit.get_child(0).play("move")
 		var open_tile = rng.randi_range(0,3)
 		if astar_grid.is_point_solid(cpu_surrounding_cells[open_tile]) == false and get_cell_source_id(0, cpu_surrounding_cells[open_tile]) != -1: 
 			
-			var patharray = astar_grid.get_point_path(cpu_target_pos, cpu_surrounding_cells[open_tile])
+			var patharray = astar_grid.get_point_path(active_pos, cpu_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
 				await get_tree().create_timer(0.01).timeout
 				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
-				if h == closest_cpu_to_human.unit_movement:
+				if h == active_unit.unit_movement:
 					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
 				
 			# Move unit		
 			for h in patharray.size():
 				moving = true		
-				if closest_cpu_to_human.check_water() == true:
+				if active_unit.check_water() == true:
 					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
-					var unit_pos = local_to_map(closest_cpu_to_human.position)
-					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var unit_pos = local_to_map(active_unit.position)
+					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
 					await tween.finished
-					closest_cpu_to_human.get_child(0).play("default")
+					active_unit.get_child(0).play("default")
 					for i in user_units.size():
 						user_units[i].selected = false
 						
 					moving = false	
 					
-				elif closest_cpu_to_human.check_land() == true:							
-					closest_cpu_to_human.get_child(0).play("move")						
+				elif active_unit.check_land() == true:							
+					active_unit.get_child(0).play("move")						
 					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
-					var unit_pos = local_to_map(closest_cpu_to_human.position)
-					closest_cpu_to_human.z_index = unit_pos.x + unit_pos.y																					
+					var unit_pos = local_to_map(active_unit.position)
+					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(closest_cpu_to_human, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
 					await tween.finished
-					closest_cpu_to_human.get_child(0).play("default")
+					active_unit.get_child(0).play("default")
 					for i in user_units.size():
 						user_units[i].selected = false
 						
@@ -1564,7 +1599,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					soundstream.stream = soundstream.map_sfx[6]
 					soundstream.play()						
 				
-				if h == closest_cpu_to_human.unit_movement:
+				if h == active_unit.unit_movement:
 					break	
 									
 			moving = false
@@ -1573,21 +1608,21 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 			for h in patharray.size():
 				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
 			
-			closest_cpu_to_human.get_child(0).play("default")	
+			active_unit.get_child(0).play("default")	
 			
 			for i in 4:
-				var cpu_pos = local_to_map(closest_cpu_to_human.position)
+				var cpu_pos = local_to_map(active_unit.position)
 				if cpu_pos == cpu_surrounding_cells[i]:
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
-					if closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x > attack_center_position.x:
-						closest_cpu_to_human.scale.x = 1
-					elif closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x < attack_center_position.x:
-						closest_cpu_to_human.scale.x = -1	
-					if closest_cpu_to_human.scale.x == -1 and closest_cpu_to_human.position.x > attack_center_position.x:
-						closest_cpu_to_human.scale.x = 1
-					elif closest_cpu_to_human.scale.x == 1 and closest_cpu_to_human.position.x < attack_center_position.x:
-						closest_cpu_to_human.scale.x = -1						
+					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
+						active_unit.scale.x = 1
+					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
+						active_unit.scale.x = -1	
+					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
+						active_unit.scale.x = 1
+					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
+						active_unit.scale.x = -1						
 		
 
 					closest_cpu_to_human.get_child(0).play("attack")
@@ -1606,12 +1641,17 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D):
 					await get_tree().create_timer(1).timeout
 					closest_atack.add_to_group("humans dead")
 					closest_atack.position.y -= 1500
-					closest_cpu_to_human.get_child(0).play("default")	
+					active_unit.get_child(0).play("default")	
 					break
 									
 			moving = false
-			closest_cpu_to_human.check_land()
-			closest_cpu_to_human.check_water()	
+			active_unit.check_land()
+			active_unit.check_water()	
+		else:
+			active_unit.check_land()
+			active_unit.check_water()
+			active_unit.get_child(0).play("default")			
+			#on_cpu()
 
 func user_mode():
 	await on_user()

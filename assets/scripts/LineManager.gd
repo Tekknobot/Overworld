@@ -50,8 +50,8 @@ func _input(event):
 					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
-					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					$"../AudioStreamPlayer2D".play()				
+					$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
+					$"../SoundStream".play()				
 					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-350), choose_random_point(), 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
@@ -60,41 +60,41 @@ func _input(event):
 					explosion_instance.position = choose_random_point()
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					
-					$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					$"../AudioStreamPlayer2D".play()
+					$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
+					$"../SoundStream".play()
 					dup.queue_free()								
 						
-		#if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
-			#if event.pressed:		 
-				#var mouse_position = get_global_mouse_position()
-				#mouse_position.y += 8
-				#var mouse_local = Map.local_to_map(mouse_position)
-				#if mouse_position != _point2 and Map.get_cell_source_id(1,mouse_local) == 14:
-					#var dup = self.duplicate()
-					#self.get_parent().add_child(dup)
-					#dup.add_to_group("trajectories")										
-					#_point2 = mouse_position		
-					#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					#var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-					#var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
-					#$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[0]
-					#$"../AudioStreamPlayer2D".play()	
-					#var _temp = dup.target			
-					#await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-0), _temp, 1)		
-					#var explosion_instance = explosion.instantiate()
-					#get_parent().add_child(explosion_instance)
-					#var explosion_pos = Map.local_to_map(_temp)
-					#explosion_instance.position = _temp
-					#explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
-					#$"../AudioStreamPlayer2D".stream = $"../AudioStreamPlayer2D".map_sfx[1]
-					#$"../AudioStreamPlayer2D".play()							
-					#var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
-					#for i in trajects.size():
-						#trajects[0].queue_free()
-											#
-					#dup.queue_free()	
-										#
+		if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
+			if event.pressed:		 
+				var mouse_position = get_global_mouse_position()
+				mouse_position.y += 8
+				var mouse_local = Map.local_to_map(mouse_position)
+				if mouse_position != _point2 and Map.get_cell_source_id(2,mouse_local) == 14:
+					var dup = self.duplicate()
+					self.get_parent().add_child(dup)
+					dup.add_to_group("trajectories")										
+					_point2 = mouse_position		
+					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
+					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
+					$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
+					$"../SoundStream".play()	
+					var _temp = dup.target			
+					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-0), _temp, 1)		
+					var explosion_instance = explosion.instantiate()
+					get_parent().add_child(explosion_instance)
+					var explosion_pos = Map.local_to_map(_temp)
+					explosion_instance.position = _temp
+					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
+					$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
+					$"../SoundStream".play()							
+					var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
+					for i in trajects.size():
+						trajects[0].queue_free()
+											
+					dup.queue_free()	
+										
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			cpu_attack()
