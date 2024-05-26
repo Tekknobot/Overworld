@@ -4,8 +4,8 @@ extends TileMap
 @onready var soundstream = $"../SoundStream"
 
 var grid = []
-var grid_width = 64
-var grid_height = 64
+var grid_width = 32
+var grid_height = 32
 
 var astar_grid = AStarGrid2D.new()
 var clicked_pos = Vector2i(0,0);
@@ -99,16 +99,18 @@ func _process(_delta):
 	for h in grid_height:
 		for i in grid_width:
 			set_cell(2, Vector2i(h+grid_height, i+grid_height), -1, Vector2i(0, 0), 0)
-	
-
 				
 func _input(event):
 	if event is InputEventKey:	
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
-		if event.pressed and event.keycode == KEY_2:
-			cpu_mode()
-									
+		if event.pressed and event.keycode == KEY_3:
+			user_mode()
+		if event.pressed and event.keycode == KEY_4:
+			cpu_mode()	
+		if event.pressed and event.keycode == KEY_5:	
+			ai_mode()					
+							
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
@@ -281,7 +283,7 @@ func _input(event):
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
 							var tween = create_tween()
-							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.1)								
 							await tween.finished
 							user_units[selected_unit_num].get_child(0).play("default")
 							for i in user_units.size():
@@ -297,7 +299,7 @@ func _input(event):
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
 							var tween = create_tween()
-							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.25)								
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.1)								
 							await tween.finished
 							user_units[selected_unit_num].get_child(0).play("default")
 							for i in user_units.size():
@@ -600,6 +602,8 @@ func on_user():
 	await user_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
 	await user_attack_ai(target_human, closest_cpu_to_human, active_unit)
+	await user_range_ai(closest_cpu_to_human.tile_pos)
+	await remove_hover_tiles()
 
 func user_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
@@ -1036,7 +1040,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
@@ -1050,7 +1054,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
@@ -1114,7 +1118,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 			active_unit.check_water()
 			active_unit.get_child(0).play("default")				
 			#on_user()
-			
+
 func on_cpu():
 	cpu = get_tree().get_nodes_in_group("humans")
 	humans = get_tree().get_nodes_in_group("cpu")
@@ -1134,24 +1138,26 @@ func on_cpu():
 	if cpu.size() == 0:
 		return
 	var target_human = rng.randi_range(0,cpu.size()-1)
-	var closest_cpu_to_human = humans[target_human].get_closest_attack_humans()
+	var closest_humans_to_cpu = humans[target_human].get_closest_attack_humans()
 	var active_unit = humans[target_human]
 	
-	await user_range_ai(closest_cpu_to_human.tile_pos)
+	await cpu_range_ai(closest_humans_to_cpu.tile_pos)
 	await remove_hover_tiles()
-	await user_attack_ai(target_human, closest_cpu_to_human, active_unit)
-
-func cpu_range_ai(closest_cpu_to_human: Vector2i):
+	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
+	await cpu_range_ai(closest_humans_to_cpu.tile_pos)
+	await remove_hover_tiles()
+	
+func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 																						
-	var closest_position = map_to_local(closest_cpu_to_human) + Vector2(0,0) / 2	
+	var closest_position = map_to_local(closest_humans_to_cpu) + Vector2(0,0) / 2	
 	var tile_pos = local_to_map(closest_position)		
 				
 	for i in user_units.size():
-		if user_units[i].tile_pos == closest_cpu_to_human:
+		if user_units[i].tile_pos == closest_humans_to_cpu:
 			right_clicked_unit = user_units[i]
 			selected_unit_num = user_units[i].unit_num
 			selected_pos = user_units[i].tile_pos	
@@ -1160,7 +1166,7 @@ func cpu_range_ai(closest_cpu_to_human: Vector2i):
 			
 	for i in user_units.size():
 		var unit_pos_map = local_to_map(user_units[i].position)
-		if unit_pos_map == closest_cpu_to_human:																				
+		if unit_pos_map == closest_humans_to_cpu:																				
 			var hoverflag_1 = true															
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
@@ -1576,7 +1582,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
@@ -1590,7 +1596,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.25)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
@@ -1627,7 +1633,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 						active_unit.scale.x = -1						
 		
 
-					closest_cpu_to_human.get_child(0).play("attack")
+					active_unit.get_child(0).play("attack")
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
 					
@@ -1652,19 +1658,9 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 		else:
 			active_unit.check_land()
 			active_unit.check_water()
-			active_unit.get_child(0).play("default")			
+			active_unit.get_child(0).play("default")				
 			#on_cpu()
-
-func user_mode():
-	for i in grid_height/4:
-		await on_user()
-	cpu_mode()
-	
-func cpu_mode():
-	for i in grid_height/4:	
-		await on_cpu()	
-	user_mode()
-			
+				
 func arrays():
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
@@ -1673,3 +1669,23 @@ func arrays():
 	all_units.append_array(cpu)		
 	user_units.append_array(humans)
 	cpu_units.append_array(cpu)			
+	
+func user_mode():
+	on_user()
+			
+func cpu_mode():
+	on_cpu()	
+	
+func ai_mode():
+	arrays()
+	if user_units.size() <= 0:
+		return
+	if cpu_units.size() <= 0:
+		return
+			
+	for i in 1:
+		await on_user()	
+	for i in 1:
+		await on_cpu()	
+	ai_mode()	
+	

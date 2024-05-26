@@ -31,8 +31,8 @@ var tile_id
 var fastNoiseLite = FastNoiseLite.new()
 var grid = []
 
-var grid_width = 64
-var grid_height = 64
+var grid_width = 32
+var grid_height = 32
 
 var structures: Array[Area2D]
 var structures_blank: Array[Area2D]
@@ -392,7 +392,7 @@ func spawn_stadiums():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:
-				if rng.randi_range(0, 2) == 0:	
+				if rng.randi_range(0, 3) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var stadium_inst = stadium.instantiate()
@@ -443,7 +443,7 @@ func spawn_towers_final():
 				progresscount += 1	
 								
 	for l in tower_coord.size():	
-		if rng.randi_range(0, 0) == 0:
+		if rng.randi_range(0, 2) == 0:
 			var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 			var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 			var tower_inst = tower.instantiate()

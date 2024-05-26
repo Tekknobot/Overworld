@@ -98,7 +98,7 @@ func _input(event):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			cpu_attack()
-		if event.keycode == KEY_3 and onTrajectory == false:
+		if event.keycode == KEY_2 and onTrajectory == false:
 			cpu_attack_2()
 										
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
@@ -241,7 +241,9 @@ func cpu_attack():
 				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
 			await get_tree().create_timer(1).timeout				
 			Map.all_units[i].position.y = -1500
-						
+			
+	if !dup_cpu:
+		return							
 	dup_cpu.queue_free()								
 
 func cpu_attack_2():
@@ -286,7 +288,9 @@ func cpu_attack_2():
 				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
 			await get_tree().create_timer(1).timeout				
 			Map.all_units[i].position.y = -1500
-						
+	
+	if !dup_cpu:
+		return					
 	dup_cpu.queue_free()								
 
 func choose_random_point():
