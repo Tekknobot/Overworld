@@ -116,6 +116,7 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
+				attack_range = false
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
 				var tile_pos = local_to_map(mouse_pos)
@@ -203,6 +204,7 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 															
 							soundstream.stream = soundstream.map_sfx[7]
 							soundstream.play()	
+							attack_range = false
 							
 						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -221,6 +223,7 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 																					
 							soundstream.stream = soundstream.map_sfx[7]
 							soundstream.play()	
+							attack_range = false
 														
 						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -239,6 +242,7 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 								
 							soundstream.stream = soundstream.map_sfx[7]
 							soundstream.play()	
+							attack_range = false
 																				
 						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
@@ -257,6 +261,7 @@ func _input(event):
 							all_units[h].remove_from_group("zombies") 								
 							soundstream.stream = soundstream.map_sfx[7]
 							soundstream.play()	
+							attack_range = false
 													
 						await get_tree().create_timer(0).timeout	
 						
@@ -281,6 +286,7 @@ func _input(event):
 					for h in patharray.size():
 						moving = true		
 						if user_units[selected_unit_num].check_water() == true:
+							user_units[selected_unit_num].get_child(0).play("move")
 							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
@@ -309,7 +315,10 @@ func _input(event):
 								
 							moving = false		
 							soundstream.stream = soundstream.map_sfx[6]
-							soundstream.play()														
+							soundstream.play()
+						
+					await user_range_ai(user_units[selected_unit_num].tile_pos)
+					on_cpu()														
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
@@ -681,6 +690,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -694,7 +704,8 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																		
+										attack_range = false								
+										
 									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
@@ -707,7 +718,8 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																								
+										attack_range = false														
+										
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
@@ -720,6 +732,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
 																												
@@ -773,6 +786,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -786,6 +800,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
 									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -799,7 +814,8 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																								
+										attack_range = false														
+										
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
@@ -812,6 +828,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
 
@@ -865,6 +882,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -879,6 +897,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].remove_from_group("zombies") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
 									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -892,6 +911,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																								
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
@@ -905,6 +925,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
 
@@ -958,6 +979,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
@@ -971,6 +993,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
 									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
@@ -984,6 +1007,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																								
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
@@ -997,6 +1021,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 										cpu_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
 				
@@ -1011,7 +1036,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 
 	soundstream.stream = soundstream.map_sfx[5]
 	soundstream.play() 
-	
+		
 func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
 		var closest_atack = closest_cpu_to_human							
@@ -1643,7 +1668,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
-					closest_atack.add_to_group("humans dead")
+					closest_atack.add_to_group("dead")
 					closest_atack.position.y -= 1500
 					active_unit.get_child(0).play("default")	
 					break
@@ -1655,7 +1680,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			active_unit.check_land()
 			active_unit.check_water()
 			active_unit.get_child(0).play("default")				
-			#on_cpu()
+			on_cpu()
 				
 func arrays():
 	humans = get_tree().get_nodes_in_group("humans")
