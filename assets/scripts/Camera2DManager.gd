@@ -23,6 +23,11 @@ func _input(event):
 		
 func _process(delta):
 	_zoom(delta)
+	var screen_size = get_viewport().size
+	var clamped_pos = Vector2(
+		clamp(position.x, limit_left + screen_size.x * zoom.x / 2, limit_right - screen_size.x * zoom.x / 2),
+		clamp(position.y, limit_top + screen_size.y * zoom.x / 2, limit_bottom - screen_size.y * zoom.x / 2)
+	)		
 	pass
 
 func _zoom(delta):
@@ -43,7 +48,7 @@ func _unhandled_input(event: InputEvent):
 			_moveCamera = false;
 	elif event is InputEventMouseMotion && _moveCamera:
 		get_viewport().set_input_as_handled()
-		position += (_previousPosition - event.position);
+		position += (_previousPosition - event.position);	
 		_previousPosition = event.position;
 	
 	pass

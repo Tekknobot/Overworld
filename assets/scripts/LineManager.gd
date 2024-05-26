@@ -98,7 +98,9 @@ func _input(event):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_1 and onTrajectory == false:
 			cpu_attack()
-								
+		if event.keycode == KEY_3 and onTrajectory == false:
+			cpu_attack_2()
+										
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
 	var line_inst = line2D.instantiate()
@@ -197,12 +199,61 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 	onTrajectory = false			
 
 func cpu_attack():
+	Map.arrays()
 	var dup_cpu = self.duplicate()
 	self.get_parent().add_child(dup_cpu)
 	dup_cpu.add_to_group("trajectories_cpu")
-	cpu_traj = dup_cpu				
+	cpu_traj = dup_cpu	
+	#var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
+	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord				
 	var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+	#if coord_B.y < 32:
+		#dup_cpu.queue_free()
+		#cpu_attack()
+		#return
+	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
+	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
+	$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
+	$"../SoundStream".play()	
+	for j in get_node("/root/Node2D").structures.size():
+		if coord_A == get_node("/root/Node2D").structures[j].coord:
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)	
+	var tile_map = Map.local_to_map(tile_pos)
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
+			var tween: Tween = create_tween()		
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
+	Map.show_attack_range(coord_A)				
+	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos, 1)
+	
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
+			Map.all_units[i].get_child(0).play("death")	
+			Map.all_units[i].add_to_group("dead") 
+			$"../SoundStream".stream = $"../SoundStream".map_sfx[7]
+			$"../SoundStream".play()	
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+			await get_tree().create_timer(1).timeout				
+			Map.all_units[i].position.y = -1500
+						
+	dup_cpu.queue_free()								
+
+func cpu_attack_2():
+	Map.arrays()
+	var dup_cpu = self.duplicate()
+	self.get_parent().add_child(dup_cpu)
+	dup_cpu.add_to_group("trajectories_cpu")
+	cpu_traj = dup_cpu	
+	var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
+	var coord_B = Map.all_units[rng.randi_range(0, Map.all_units.size()-1)].tile_pos			
+	#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#if coord_B.y < 32:
 		#dup_cpu.queue_free()
 		#cpu_attack()
@@ -215,9 +266,27 @@ func cpu_attack():
 		if coord_B == get_node("/root/Node2D").structures[j].coord:
 			var tween: Tween = create_tween()
 			for k in 8:
-				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)							
+				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)	
+	var tile_map = Map.local_to_map(tile_pos2)
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
+			var tween: Tween = create_tween()		
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
 	Map.show_attack_range(coord_B)				
-	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)	
+	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)
+	
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
+			Map.all_units[i].get_child(0).play("death")	
+			$"../SoundStream".stream = $"../SoundStream".map_sfx[7]
+			$"../SoundStream".play()	
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+			await get_tree().create_timer(1).timeout				
+			Map.all_units[i].position.y = -1500
+						
 	dup_cpu.queue_free()								
 
 func choose_random_point():
