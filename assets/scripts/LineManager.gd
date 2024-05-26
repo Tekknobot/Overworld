@@ -99,8 +99,8 @@ func _input(event):
 		if event.keycode == KEY_1 and onTrajectory == false:
 			cpu_attack()
 		if event.keycode == KEY_2 and onTrajectory == false:
-			cpu_attack_2()
-										
+			cpu_attack_2()	
+												
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
 	var line_inst = line2D.instantiate()
@@ -306,7 +306,10 @@ func choose_random_point():
 				
 	return _the_point	
 
-
 func _on_timer_timeout():
-	#cpu_attack()
+	missile_launch()
 	pass
+
+func missile_launch():
+	cpu_attack_2()
+	cpu_attack()

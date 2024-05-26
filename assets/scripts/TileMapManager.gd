@@ -30,6 +30,8 @@ var left_clicked_unit
 var attack_range = false
 
 var _temp
+var alive_humans = []
+var alive_cpu = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -595,14 +597,18 @@ func on_user():
 	
 	if cpu.size() == 0:
 		return
+	for i in user_units.size():
+		if !user_units[i].is_in_group("dead"):
+			alive_humans.append(user_units[i])
+
 	var target_human = rng.randi_range(0,cpu.size()-1)
-	var closest_cpu_to_human = humans[target_human].get_closest_attack_cpu()
-	var active_unit = humans[target_human]
+	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
+	var active_unit = alive_humans[target_human]
 	
-	await user_range_ai(closest_cpu_to_human.tile_pos)
+	await user_range_ai(closest_humans_to_cpu.tile_pos)
 	await remove_hover_tiles()
-	await user_attack_ai(target_human, closest_cpu_to_human, active_unit)
-	await user_range_ai(closest_cpu_to_human.tile_pos)
+	await user_attack_ai(target_human, closest_humans_to_cpu, active_unit)
+	await user_range_ai(closest_humans_to_cpu.tile_pos)
 	await remove_hover_tiles()
 
 func user_range_ai(closest_cpu_to_human: Vector2i):
@@ -1006,14 +1012,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 	soundstream.stream = soundstream.map_sfx[5]
 	soundstream.play() 
 	
-func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):	
-	if !closest_cpu_to_human:		
-		return
-	
-	if closest_cpu_to_human.is_in_group("dead"):
-		on_user()
-		return
-				
+func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
 		var closest_atack = closest_cpu_to_human							
 		var cpu_target_pos = local_to_map(closest_atack.position)
@@ -1137,10 +1136,14 @@ func on_cpu():
 	
 	if cpu.size() == 0:
 		return
+	for i in cpu_units.size():
+		if !cpu_units[i].is_in_group("dead"):
+			alive_cpu.append(cpu_units[i])
+
 	var target_human = rng.randi_range(0,cpu.size()-1)
-	var closest_humans_to_cpu = humans[target_human].get_closest_attack_humans()
-	var active_unit = humans[target_human]
-	
+	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
+	var active_unit = alive_cpu[target_human]
+			
 	await cpu_range_ai(closest_humans_to_cpu.tile_pos)
 	await remove_hover_tiles()
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
@@ -1548,14 +1551,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 	soundstream.stream = soundstream.map_sfx[5]
 	soundstream.play() 
 	
-func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):	
-	if !closest_cpu_to_human:		
-		return
-	
-	if closest_cpu_to_human.is_in_group("dead"):
-		on_user()
-		return
-				
+func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
 		var closest_atack = closest_cpu_to_human							
 		var cpu_target_pos = local_to_map(closest_atack.position)
@@ -1678,11 +1674,6 @@ func cpu_mode():
 	
 func ai_mode():
 	arrays()
-	if user_units.size() <= 0:
-		return
-	if cpu_units.size() <= 0:
-		return
-			
 	for i in 1:
 		await on_user()	
 	for i in 1:
