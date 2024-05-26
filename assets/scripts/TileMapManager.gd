@@ -570,6 +570,7 @@ func on_user():
 	await user_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
 	await user_attack_ai(target_human, closest_cpu_to_human)
+	on_cpu()
 
 func user_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
@@ -1102,9 +1103,10 @@ func on_cpu():
 	var target_human = rng.randi_range(0,cpu.size()-1)
 	var closest_cpu_to_human = cpu[target_human].get_closest_attack_cpu()
 	
-	await user_range_ai(closest_cpu_to_human.tile_pos)
+	await cpu_range_ai(closest_cpu_to_human.tile_pos)
 	await remove_hover_tiles()
-	await user_attack_ai(target_human, closest_cpu_to_human)
+	await cpu_attack_ai(target_human, closest_cpu_to_human)
+	on_user()
 
 func cpu_range_ai(closest_cpu_to_human: Vector2i):
 	#Remove hover tiles										
