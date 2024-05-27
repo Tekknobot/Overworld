@@ -1710,7 +1710,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			active_unit.check_land()
 			active_unit.check_water()
 			active_unit.get_child(0).play("default")				
-			#on_user()
+			on_cpu()
 			
 func arrays():
 	all_units.clear()
