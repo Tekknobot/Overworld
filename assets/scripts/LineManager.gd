@@ -15,8 +15,8 @@ var _point2 : Vector2
 
 var _the_point: Vector2
 
-var grid_width = 64
-var grid_height = 64
+var grid_width = 32
+var grid_height = 32
 
 var rng = RandomNumberGenerator.new()
 var trajectory_set = false
