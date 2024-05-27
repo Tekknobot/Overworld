@@ -1128,14 +1128,15 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 						active_unit.scale.x = -1						
 		
 
-					active_unit.get_child(0).play("attack")
-					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
+					active_unit.get_child(0).play("attack")		
 					
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
 						
 					await get_tree().create_timer(1).timeout
+
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)					
 					closest_atack.get_child(0).play("death_2")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
@@ -1688,14 +1689,15 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 						active_unit.scale.x = -1						
 		
 
-					active_unit.get_child(0).play("attack")
-					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)		
+					active_unit.get_child(0).play("attack")	
 					
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
 						
 					await get_tree().create_timer(1).timeout
+					
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)						
 					closest_atack.get_child(0).play("death_2")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
