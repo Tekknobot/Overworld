@@ -125,6 +125,10 @@ func _input(event):
 
 				clicked_pos = tile_pos	
 				
+				all_units.clear()
+				user_units.clear()
+				cpu_units.clear()	
+								
 				humans = get_tree().get_nodes_in_group("humans")
 				cpu = get_tree().get_nodes_in_group("cpu")
 				
@@ -316,7 +320,8 @@ func _input(event):
 							moving = false		
 							soundstream.stream = soundstream.map_sfx[6]
 							soundstream.play()
-						
+					
+					await user_range_ai(user_units[selected_unit_num].tile_pos, user_units[selected_unit_num])	
 					on_cpu()														
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -588,6 +593,10 @@ func remove_hover_tiles():
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 
 func on_user():
+	all_units.clear()
+	user_units.clear()
+	cpu_units.clear()	
+		
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
 	
@@ -603,13 +612,13 @@ func on_user():
 	
 	moving = false		
 	
-	if cpu.size() == 0:
-		return
+	alive_humans.clear()
+	
 	for i in user_units.size():
 		if !user_units[i].is_in_group("dead"):
 			alive_humans.append(user_units[i])
 
-	var target_human = rng.randi_range(0,cpu.size()-1)
+	var target_human = rng.randi_range(0,alive_humans.size()-1)
 	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
 	var active_unit = alive_humans[target_human]
 	
@@ -1144,6 +1153,10 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 			#on_user()
 
 func on_cpu():
+	all_units.clear()
+	user_units.clear()
+	cpu_units.clear()	
+	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
 	
@@ -1159,13 +1172,13 @@ func on_cpu():
 	
 	moving = false		
 	
-	if cpu.size() == 0:
-		return
+	alive_cpu.clear()
+	
 	for i in cpu_units.size():
 		if !cpu_units[i].is_in_group("dead"):
 			alive_cpu.append(cpu_units[i])
 
-	var target_human = rng.randi_range(0,cpu.size()-1)
+	var target_human = rng.randi_range(0,alive_cpu.size()-1)
 	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
 	var active_unit = alive_cpu[target_human]
 	
@@ -1700,6 +1713,10 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			#on_user()
 			
 func arrays():
+	all_units.clear()
+	user_units.clear()
+	cpu_units.clear()		
+	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
 	
