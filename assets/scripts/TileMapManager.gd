@@ -1145,13 +1145,13 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 			#on_user()
 
 func on_cpu():
-	cpu = get_tree().get_nodes_in_group("humans")
-	humans = get_tree().get_nodes_in_group("cpu")
+	humans = get_tree().get_nodes_in_group("humans")
+	cpu = get_tree().get_nodes_in_group("cpu")
 	
 	all_units.append_array(humans)	
 	all_units.append_array(cpu)		
-	user_units.append_array(cpu)
-	cpu_units.append_array(humans)		
+	user_units.append_array(humans)
+	cpu_units.append_array(cpu)		
 	
 	#Remove hover tiles										
 	for j in grid_height:
