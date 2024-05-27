@@ -317,7 +317,6 @@ func _input(event):
 							soundstream.stream = soundstream.map_sfx[6]
 							soundstream.play()
 						
-					await user_range_ai(user_units[selected_unit_num].tile_pos)
 					on_cpu()														
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -614,23 +613,23 @@ func on_user():
 	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
 	var active_unit = alive_humans[target_human]
 	
-	await user_range_ai(closest_humans_to_cpu.tile_pos)
+	await user_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
 	await user_attack_ai(target_human, closest_humans_to_cpu, active_unit)
-	await user_range_ai(closest_humans_to_cpu.tile_pos)
+	await user_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
 
-func user_range_ai(closest_cpu_to_human: Vector2i):
+func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 																						
 	var closest_position = map_to_local(closest_cpu_to_human) + Vector2(0,0) / 2	
-	var tile_pos = local_to_map(closest_position)		
+	var tile_pos = local_to_map(active_unit.position)		
 				
 	for i in user_units.size():
-		if user_units[i].tile_pos == closest_cpu_to_human:
+		if user_units[i].tile_pos == active_unit.tile_pos:
 			right_clicked_unit = user_units[i]
 			selected_unit_num = user_units[i].unit_num
 			selected_pos = user_units[i].tile_pos	
@@ -639,7 +638,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i):
 			
 	for i in user_units.size():
 		var unit_pos_map = local_to_map(user_units[i].position)
-		if unit_pos_map == closest_cpu_to_human:																				
+		if unit_pos_map == active_unit.tile_pos:																				
 			var hoverflag_1 = true															
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
@@ -1699,8 +1698,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			active_unit.check_water()
 			active_unit.get_child(0).play("default")				
 			#on_user()
-
-					
+			
 func arrays():
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
