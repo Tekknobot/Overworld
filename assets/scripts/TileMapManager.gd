@@ -1169,401 +1169,418 @@ func on_cpu():
 	var target_human = rng.randi_range(0,cpu.size()-1)
 	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
 	var active_unit = alive_cpu[target_human]
-			
-	await cpu_range_ai(closest_humans_to_cpu.tile_pos)
+	
+	await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
-	await cpu_range_ai(closest_humans_to_cpu.tile_pos)
+	await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
-	
-func cpu_range_ai(closest_humans_to_cpu: Vector2i):
+
+func cpu_range_ai(closest_humans_to_cpu: Vector2i, active_unit: Area2D):
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 																						
 	var closest_position = map_to_local(closest_humans_to_cpu) + Vector2(0,0) / 2	
-	var tile_pos = local_to_map(closest_position)		
+	var tile_pos = local_to_map(active_unit.position)		
 				
-	for i in user_units.size():
-		if user_units[i].tile_pos == closest_humans_to_cpu:
-			right_clicked_unit = user_units[i]
-			selected_unit_num = user_units[i].unit_num
-			selected_pos = user_units[i].tile_pos	
+	for i in cpu_units.size():
+		if cpu_units[i].tile_pos == active_unit.tile_pos:
+			right_clicked_unit = cpu_units[i]
+			selected_unit_num = cpu_units[i].unit_num
+			selected_pos = cpu_units[i].tile_pos	
 			attack_range = true												
 			break	
 			
-	for i in user_units.size():
-		var unit_pos_map = local_to_map(user_units[i].position)
-		if unit_pos_map == closest_humans_to_cpu:																				
+	for i in cpu_units.size():
+		var unit_pos_map = local_to_map(cpu_units[i].position)
+		if unit_pos_map == active_unit.tile_pos:																		
 			var hoverflag_1 = true															
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 				if hoverflag_1 == true:
 					if tile_pos.x-j >= 0:	
 						set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and cpu_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
 							hoverflag_1 = false
-							for l in cpu_units.size():
-								if cpu_units[l].tile_pos == Vector2i(tile_pos.x-j, tile_pos.y):
+							for l in user_units.size():
+								if user_units[l].tile_pos == Vector2i(tile_pos.x-j, tile_pos.y):
 									var closest =  map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == 1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif cpu_units[i].scale.x == -1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == -1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif cpu_units[i].scale.x == 1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1																																					
 															
-									user_units[i].get_child(0).play("attack")	
+									cpu_units[i].get_child(0).play("attack")	
 									
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
 									await get_tree().create_timer(0.1).timeout
-									user_units[i].get_child(0).play("default")		
+									cpu_units[i].get_child(0).play("default")		
 									
 									var _bumpedvector = cpu_units[l].tile_pos
-									var right_clicked_pos = local_to_map(user_units[i].position)
+									var right_clicked_pos = local_to_map(cpu_units[i].position)
 																		 	
-									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
+									await SetLinePoints(Vector2(cpu_units[i].position.x, cpu_units[i].position.y-16), closest)
 									
-									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.y < user_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
-									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+									if right_clicked_pos.y > user_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																		
-									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+										attack_range = false								
+										
+									if right_clicked_pos.x > user_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead")  															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																								
-									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+										attack_range = false														
+										
+									if right_clicked_pos.x < user_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead")  															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-																												
+			cpu_units[i].check_water()																									
 			var hoverflag_2 = true										
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 				if hoverflag_2 == true:																																	
 					if tile_pos.y+j <= grid_height:
 						set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and cpu_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
 							hoverflag_2 = false
-							for l in cpu_units.size():
-								if cpu_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y+j):
+							for l in user_units.size():
+								if user_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y+j):
 									var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == 1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif cpu_units[i].scale.x == -1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == -1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif cpu_units[i].scale.x == 1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1																																					
 															
-									user_units[i].get_child(0).play("attack")	
+									cpu_units[i].get_child(0).play("attack")	
 									
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
 									await get_tree().create_timer(0.1).timeout
-									user_units[i].get_child(0).play("default")	
+									cpu_units[i].get_child(0).play("default")	
 									
 									var _bumpedvector = cpu_units[l].tile_pos
-									var right_clicked_pos = local_to_map(user_units[i].position)
+									var right_clicked_pos = local_to_map(cpu_units[i].position)
 																		 	
-									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
+									await SetLinePoints(Vector2(cpu_units[i].position.x, cpu_units[i].position.y-16), closest)
 									
-									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.y < user_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
 										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 														
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
-									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+									if right_clicked_pos.y > user_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
-									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.x > user_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 														
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
-																								
-									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+										attack_range = false														
+										
+									if right_clicked_pos.x < user_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-
+			cpu_units[i].check_water()
 			var hoverflag_3 = true	
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 				if hoverflag_3 == true:																																								
 					if tile_pos.x+j <= grid_height:
 						set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and cpu_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
 							hoverflag_3 = false
-							for l in cpu_units.size():
-								if cpu_units[l].tile_pos == Vector2i(tile_pos.x+j, tile_pos.y):
+							for l in user_units.size():
+								if user_units[l].tile_pos == Vector2i(tile_pos.x+j, tile_pos.y):
 									var closest =  map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == 1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif cpu_units[i].scale.x == -1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == -1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif cpu_units[i].scale.x == 1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1																																					
 															
-									user_units[i].get_child(0).play("attack")	
+									cpu_units[i].get_child(0).play("attack")	
 									
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
 									await get_tree().create_timer(0.1).timeout
-									user_units[i].get_child(0).play("default")	
+									cpu_units[i].get_child(0).play("default")	
 									
 									var _bumpedvector = cpu_units[l].tile_pos
-									var right_clicked_pos = local_to_map(user_units[i].position)
+									var right_clicked_pos = local_to_map(cpu_units[i].position)
 																		 	
-									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
+									await SetLinePoints(Vector2(cpu_units[i].position.x, cpu_units[i].position.y-16), closest)
 									
-									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.y < user_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
-									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+									if right_clicked_pos.y > user_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 
-										cpu_units[l].remove_from_group("zombies") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 
+										user_units[l].remove_from_group("zombies") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
-									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.x > user_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead")  															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead")  															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																								
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
-
+			cpu_units[i].check_water()
 			var hoverflag_4 = true	
 			for j in grid_height:	
 				set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
 				if hoverflag_4 == true:																																						
 					if tile_pos.y-j >= 0:									
 						set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and cpu_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
 							hoverflag_4 = false
-							for l in cpu_units.size():
-								if cpu_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y-j):
+							for l in user_units.size():
+								if user_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y-j):
 									var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == 1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif cpu_units[i].scale.x == -1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if cpu_units[i].scale.x == -1 and cpu_units[i].position.x > attack_center_pos.x:
+										cpu_units[i].scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif cpu_units[i].scale.x == 1 and cpu_units[i].position.x < attack_center_pos.x:
+										cpu_units[i].scale.x = -1																																					
 															
-									user_units[i].get_child(0).play("attack")	
+									cpu_units[i].get_child(0).play("attack")	
 									
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
 									await get_tree().create_timer(0.1).timeout
-									user_units[i].get_child(0).play("default")	
+									cpu_units[i].get_child(0).play("default")	
 									
 									var _bumpedvector = cpu_units[l].tile_pos
-									var right_clicked_pos = local_to_map(user_units[i].position)
+									var right_clicked_pos = local_to_map(cpu_units[i].position)
 																		 	
-									await SetLinePoints(Vector2(user_units[i].position.x, user_units[i].position.y-16), closest)
+									await SetLinePoints(Vector2(cpu_units[i].position.x, cpu_units[i].position.y-16), closest)
 									
-									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.y < user_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 											
-									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
+									if right_clicked_pos.y > user_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																		
-									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
+									if right_clicked_pos.x > user_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 															
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 															
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																								
-									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
+									if right_clicked_pos.x < user_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
-										cpu_units[l].get_child(0).play("death")
+										tween.tween_property(user_units[l], "modulate:v", 1, 0.50).from(5)
+										user_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
 										await get_tree().create_timer(0.5).timeout	
-										cpu_units[l].position.y -= 1500		
-										cpu_units[l].add_to_group("dead") 														
+										user_units[l].position.y -= 1500		
+										user_units[l].add_to_group("dead") 														
 										soundstream.stream = soundstream.map_sfx[7]
 										soundstream.play()	
+										attack_range = false
 																
 									await get_tree().create_timer(0).timeout	
+			cpu_units[i].check_water()
 				
 	if tile_pos.x == 0:
 		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
@@ -1576,7 +1593,7 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i):
 
 	soundstream.stream = soundstream.map_sfx[5]
 	soundstream.play() 
-	
+		
 func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
 		var closest_atack = closest_cpu_to_human							
@@ -1669,7 +1686,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
-					closest_atack.add_to_group("dead")
+					closest_atack.add_to_group("humans dead")
 					closest_atack.position.y -= 1500
 					active_unit.get_child(0).play("default")	
 					break
@@ -1681,8 +1698,9 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			active_unit.check_land()
 			active_unit.check_water()
 			active_unit.get_child(0).play("default")				
-			on_cpu()
-				
+			#on_user()
+
+					
 func arrays():
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
