@@ -33,6 +33,9 @@ var _temp
 var alive_humans = []
 var alive_cpu = []
 
+var dead_humans = 0
+var dead_cpu = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
@@ -612,11 +615,12 @@ func on_user():
 	
 	moving = false		
 	
-	alive_humans.clear()
-	
+	alive_humans.clear()	
+					
 	for i in user_units.size():
 		if !user_units[i].is_in_group("dead"):
 			alive_humans.append(user_units[i])
+
 
 	var target_human = rng.randi_range(0,alive_humans.size()-1)
 	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
@@ -1724,6 +1728,16 @@ func arrays():
 	all_units.append_array(cpu)		
 	user_units.append_array(humans)
 	cpu_units.append_array(cpu)			
+
+	alive_humans.clear()	
+	for i in user_units.size():
+		if !user_units[i].is_in_group("dead"):
+			alive_humans.append(user_units[i])
+	
+	alive_cpu.clear()		
+	for i in cpu_units.size():
+		if !cpu_units[i].is_in_group("dead"):
+			alive_cpu.append(cpu_units[i])			
 	
 func user_mode():
 	on_user()
@@ -1732,10 +1746,13 @@ func cpu_mode():
 	on_cpu()	
 	
 func ai_mode():
-	arrays()
-	for i in 1:
-		await on_user()	
-	for i in 1:
+	await arrays()
+	if alive_cpu.size() <= 1 or alive_humans.size() <= 1:	
+		return				
+				
+	for i in 1:	
+		await on_user()			
+	for i in 1:	
 		await on_cpu()	
 	ai_mode()	
 	
