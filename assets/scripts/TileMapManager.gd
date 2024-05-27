@@ -442,51 +442,51 @@ func show_attack_range(tile_pos: Vector2i):
 	for k in surrounding_cells.size():
 		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
 		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)									
-		if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+		if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= grid_height or surrounding_cells[k].x >= grid_height or surrounding_cells[k].y <= -1:
 			set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
 			set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
-	for k in surrounding_cells.size():
-		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(2, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
-	for k in surrounding_cells.size():
-		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(2, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
-	for k in surrounding_cells.size():
-		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(2, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
-	for k in surrounding_cells.size():
-		set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-		set_cell(2, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
-		set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
-											
-	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
-	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
-
-	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
-	set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
-
-	set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
-	set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
-	set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
-	set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
+	#for k in surrounding_cells.size():
+		#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		#set_cell(2, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
+	#for k in surrounding_cells.size():
+		#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		#set_cell(2, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
+	#for k in surrounding_cells.size():
+		#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		#set_cell(2, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
+	#for k in surrounding_cells.size():
+		#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+		#set_cell(2, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
+		#set_cell(2, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
+											#
+	#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	#set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	#set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+#
+	#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	#set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	#set_cell(2, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+#
+	#set_cell(2, tile_pos, -1, Vector2i(0, 0), 0)
+	#set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
+	#set_cell(2, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	#set_cell(2, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
 
 func show_movement_range(tile_pos: Vector2i):
 	#Remove hover tiles										
@@ -1747,12 +1747,16 @@ func cpu_mode():
 	
 func ai_mode():
 	await arrays()
-	if alive_cpu.size() <= 1 or alive_humans.size() <= 1:	
+	if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
 		return				
 				
 	for i in 1:	
-		await on_user()			
+		await on_user()
+		if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
+			return				
 	for i in 1:	
 		await on_cpu()	
+		if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
+			return			
 	ai_mode()	
 	
