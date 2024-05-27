@@ -658,24 +658,24 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 				if hoverflag_1 == true:
 					if tile_pos.x-j >= 0:	
 						set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
 							hoverflag_1 = false
 							for l in cpu_units.size():
 								if cpu_units[l].tile_pos == Vector2i(tile_pos.x-j, tile_pos.y):
 									var closest =  map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == 1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == -1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1																																					
 															
 									user_units[i].get_child(0).play("attack")	
 									
@@ -754,24 +754,24 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 				if hoverflag_2 == true:																																	
 					if tile_pos.y+j <= grid_height:
 						set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and active_unit.tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
 							hoverflag_2 = false
 							for l in cpu_units.size():
 								if cpu_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y+j):
 									var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == 1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == -1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1																																					
 															
 									user_units[i].get_child(0).play("attack")	
 									
@@ -850,21 +850,21 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 				if hoverflag_3 == true:																																								
 					if tile_pos.x+j <= grid_height:
 						set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 14, Vector2i(0, 0), 0)
-						if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and user_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
+						if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
 							hoverflag_3 = false
 							for l in cpu_units.size():
 								if cpu_units[l].tile_pos == Vector2i(tile_pos.x+j, tile_pos.y):
 									var closest =  map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == 1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
 									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
 										user_units[i].scale.x = -1																																					
@@ -1136,13 +1136,13 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					soundstream.play()							
 						
 					await get_tree().create_timer(1).timeout
-					closest_atack.get_child(0).play("death")	
+					closest_atack.get_child(0).play("death_2")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
-					closest_atack.add_to_group("humans dead")
+					closest_atack.add_to_group("dead")
 					closest_atack.position.y -= 1500
 					active_unit.get_child(0).play("default")	
 					break
@@ -1696,13 +1696,13 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					soundstream.play()							
 						
 					await get_tree().create_timer(1).timeout
-					closest_atack.get_child(0).play("death")	
+					closest_atack.get_child(0).play("death_2")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
 									
 					await get_tree().create_timer(1).timeout
-					closest_atack.add_to_group("humans dead")
+					closest_atack.add_to_group("dead")
 					closest_atack.position.y -= 1500
 					active_unit.get_child(0).play("default")	
 					break
