@@ -497,7 +497,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -512,7 +512,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -527,7 +527,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.x > cpu_units[l].tile_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -542,7 +542,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.x < cpu_units[l].tile_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -597,7 +597,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.y < cpu_units[l].tile_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -612,7 +612,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									if right_clicked_pos.y > cpu_units[l].tile_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
 										var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
 										var tween: Tween = create_tween()
-										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.50).from(5)
+										tween.tween_property(cpu_units[l], "modulate:v", 1, 0.5).from(5)
 										cpu_units[l].get_child(0).play("death")
 										soundstream.stream = soundstream.map_sfx[1]
 										soundstream.play()								
@@ -1361,7 +1361,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			var patharray = astar_grid.get_point_path(active_pos, cpu_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
-				await get_tree().create_timer(0.1).timeout
+				await get_tree().create_timer(0.01).timeout
 				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
 				if h == active_unit.unit_movement:
 					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
@@ -1433,7 +1433,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					#await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)						
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
 					closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
