@@ -9,4 +9,4 @@ func _ready():
 func _process(_delta):
 	var tile_pos = get_node("../TileMap").local_to_map(self.position)
 	# Z index layering
-	self.z_index = (tile_pos.x + tile_pos.y) + 5
+	self.z_index = (tile_pos.x + tile_pos.y) + 2

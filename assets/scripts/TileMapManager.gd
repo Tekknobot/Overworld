@@ -2,6 +2,7 @@ extends TileMap
 
 @export var node2D: Node2D
 @onready var soundstream = $"../SoundStream"
+@onready var linemanager = $"../LineManager"
 
 var grid = []
 var grid_width = 32
@@ -157,124 +158,7 @@ func _input(event):
 						soundstream.stream = soundstream.map_sfx[8]
 						soundstream.play()							
 						break
-						
-				# Ranged Attack
-				for h in all_units.size():					
-					var clicked_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2
-					left_clicked_unit = all_units[h]
-					
-					#Butch Projectile shoot	
-					if mouse_position == all_units[h].position and get_cell_source_id(1, tile_pos) == 14 and attack_range == true:
-						var attack_center_pos = map_to_local(clicked_pos) + Vector2(0,0) / 2	
-						
-						if right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x > attack_center_pos.x:
-							right_clicked_unit.scale.x = 1
-						
-						elif right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x < attack_center_pos.x:
-							right_clicked_unit.scale.x = -1	
-						
-						if right_clicked_unit.scale.x == -1 and right_clicked_unit.position.x > attack_center_pos.x:
-							right_clicked_unit.scale.x = 1
-						
-						elif right_clicked_unit.scale.x == 1 and right_clicked_unit.position.x < attack_center_pos.x:
-							right_clicked_unit.scale.x = -1																																					
-												
-						right_clicked_unit.get_child(0).play("attack")	
-						
-						soundstream.stream = soundstream.map_sfx[3]
-						soundstream.play()	
-												
-						await get_tree().create_timer(0.1).timeout
-						right_clicked_unit.get_child(0).play("default")		
-						
-						var _bumpedvector = clicked_pos
-						var right_clicked_pos = local_to_map(right_clicked_unit.position)
-						
-						 	
-						await SetLinePoints(Vector2(right_clicked_unit.position.x,right_clicked_unit.position.y-16), Vector2(all_units[h].position.x,all_units[h].position.y-16))
-						all_units[h].get_child(0).set_offset(Vector2(0,0))
-													
-						if right_clicked_pos.y < clicked_pos.y and right_clicked_unit.position.x > attack_center_pos.x:	
-							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2
-							get_node("../TileMap").all_units[h].position = clicked_pos
-							all_units[h].position = tile_center_pos	
-							var unit_pos = local_to_map(all_units[h].position)										
-							all_units[h].z_index = unit_pos.x + unit_pos.y	
-							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-							all_units[h].get_child(0).play("death")
-							soundstream.stream = soundstream.map_sfx[1]
-							soundstream.play()								
-							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 1500		
-							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 															
-							soundstream.stream = soundstream.map_sfx[7]
-							soundstream.play()	
-							attack_range = false
-							
-						if right_clicked_pos.y > clicked_pos.y and right_clicked_unit.position.x < attack_center_pos.x:								
-							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
-							get_node("../TileMap").all_units[h].position = clicked_pos
-							all_units[h].position = tile_center_pos	
-							var unit_pos = local_to_map(all_units[h].position)										
-							all_units[h].z_index = unit_pos.x + unit_pos.y
-							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-							all_units[h].get_child(0).play("death")
-							soundstream.stream = soundstream.map_sfx[1]
-							soundstream.play()								
-							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 1500		
-							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 																					
-							soundstream.stream = soundstream.map_sfx[7]
-							soundstream.play()	
-							attack_range = false
-														
-						if right_clicked_pos.x > clicked_pos.x and right_clicked_unit.position.x > attack_center_pos.x:	
-							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
-							get_node("../TileMap").all_units[h].position = clicked_pos
-							all_units[h].position = tile_center_pos	
-							var unit_pos = local_to_map(all_units[h].position)										
-							all_units[h].z_index = unit_pos.x + unit_pos.y
-							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-							all_units[h].get_child(0).play("death")
-							soundstream.stream = soundstream.map_sfx[1]
-							soundstream.play()									
-							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 1500		
-							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 								
-							soundstream.stream = soundstream.map_sfx[7]
-							soundstream.play()	
-							attack_range = false
-																				
-						if right_clicked_pos.x < clicked_pos.x and right_clicked_unit.position.x < attack_center_pos.x:
-							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
-							get_node("../TileMap").all_units[h].position = clicked_pos
-							all_units[h].position = tile_center_pos	
-							var unit_pos = local_to_map(all_units[h].position)										
-							all_units[h].z_index = unit_pos.x + unit_pos.y		
-							var tween: Tween = create_tween()
-							tween.tween_property(all_units[h], "modulate:v", 1, 0.50).from(5)
-							all_units[h].get_child(0).play("death")
-							soundstream.stream = soundstream.map_sfx[1]
-							soundstream.play()								
-							await get_tree().create_timer(0.5).timeout	
-							all_units[h].position.y -= 1500		
-							all_units[h].add_to_group("dead") 
-							all_units[h].remove_from_group("zombies") 								
-							soundstream.stream = soundstream.map_sfx[7]
-							soundstream.play()	
-							attack_range = false
-													
-						await get_tree().create_timer(0).timeout	
-						
-					if all_units[h].in_water == true:
-						all_units[h].get_child(0).play("water")
-																		
+																							
 				#Move unit
 				if get_cell_source_id(1, tile_pos) == 7 and astar_grid.is_point_solid(tile_pos) == false and user_units[selected_unit_num].selected == true:
 					#Remove hover tiles										
@@ -551,43 +435,6 @@ func show_full_range():
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), 7, Vector2i(0, 0), 0)	
-
-func SetLinePoints(a: Vector2, b: Vector2):
-	var _a = get_node("../TileMap").local_to_map(a)
-	var _b = get_node("../TileMap").local_to_map(b)		
-
-	var projectile = preload("res://assets/scenes/vfx/explosion.scn")
-	var projectile_instance = projectile.instantiate()
-	var projectile_position = get_node("../TileMap").map_to_local(_a) + Vector2(0,0) / 2
-	projectile_instance.set_name("explosion")
-	get_parent().add_child(projectile_instance)
-	projectile_instance.position = projectile_position	
-	projectile_instance.position.y -= 16
-	projectile_instance.z_index = (_a.x + _a.y) + 1
-		
-	projectile_instance.position = a
-	projectile_instance.z_index = projectile_instance.position.x + projectile_instance.position.y
-	var tween: Tween = create_tween()
-	tween.tween_property(projectile_instance, "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
-	await get_tree().create_timer(1).timeout	
-
-	projectile_instance.queue_free()		
-
-	var explosion = preload("res://assets/scenes/vfx/explosion.scn")
-	var explosion_instance = explosion.instantiate()
-	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
-	explosion_instance.set_name("explosion")
-	get_parent().add_child(explosion_instance)
-	explosion_instance.position = explosion_position	
-	explosion_instance.position.y -= 16
-	explosion_instance.z_index = (_b.x + _b.y) + 1
-
-	#Remove hover tiles										
-	for j in grid_height:
-		for k in grid_width:
-			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
-			
-	attack_range = false		
 
 func remove_hover_tiles():
 	#Remove hover tiles										
@@ -1133,11 +980,11 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
 						
-					await get_tree().create_timer(1).timeout
+					#await get_tree().create_timer(1).timeout
 
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)					
-					closest_atack.get_child(0).play("death_2")	
+					closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
@@ -1192,6 +1039,7 @@ func on_cpu():
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
 	await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
+	await linemanager.missile_launch()
 
 func cpu_range_ai(closest_humans_to_cpu: Vector2i, active_unit: Area2D):
 	#Remove hover tiles										
@@ -1694,11 +1542,11 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
 						
-					await get_tree().create_timer(1).timeout
+					#await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.50).from(5)						
-					closest_atack.get_child(0).play("death_2")	
+					closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
@@ -1749,16 +1597,73 @@ func cpu_mode():
 	
 func ai_mode():
 	await arrays()
-	if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return				
 				
 	for i in 1:	
 		await on_user()
-		if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
+		if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 			return				
 	for i in 1:	
 		await on_cpu()	
-		if alive_cpu.size() <= 2 or alive_humans.size() <= 2:	
+		if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 			return			
+	#for i in 1:	
+		#await linemanager.missile_launch()	
+		#if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+			#return				
 	ai_mode()	
 	
+func SetLinePoints(a: Vector2, b: Vector2):
+	var _a = get_node("../TileMap").local_to_map(a)
+	var _b = get_node("../TileMap").local_to_map(b)		
+
+	var projectile = preload("res://assets/scenes/prefab/projectile.scn")
+	var projectile_instance = projectile.instantiate()
+	var projectile_position = get_node("../TileMap").map_to_local(_a) + Vector2(0,0) / 2
+	projectile_instance.set_name("explosion")
+	get_parent().add_child(projectile_instance)
+	projectile_instance.position = projectile_position	
+	projectile_instance.position.y -= 16
+	projectile_instance.z_index = (_a.x + _a.y) + 1
+		
+	projectile_instance.position = a
+	projectile_instance.z_index = projectile_instance.position.x + projectile_instance.position.y
+	var tween: Tween = create_tween()
+	b.y -= 16
+	tween.tween_property(projectile_instance, "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+
+	var blast = preload("res://assets/scenes/vfx/explosion.scn")
+	var blast_instance = blast.instantiate()
+	var blast_position = get_node("../TileMap").map_to_local(_a) + Vector2(0,0) / 2
+	blast_instance.set_name("blast")
+	get_parent().add_child(blast_instance)
+	blast_instance.position = blast_position	
+	blast_instance.position.y -= 16
+	blast_instance.z_index = (_a.x + _a.y) + 1
+		
+	blast_instance.position = a
+	blast_instance.z_index = blast_instance.position.x + blast_instance.position.y
+	var tween_blast: Tween = create_tween()
+	b.y -= 16
+	tween_blast.tween_property(blast_instance, "position", b, 1).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_OUT)	
+	await get_tree().create_timer(1).timeout		
+
+	projectile_instance.queue_free()		
+	blast_instance.queue_free()	
+
+	var explosion = preload("res://assets/scenes/vfx/explosion.scn")
+	var explosion_instance = explosion.instantiate()
+	var explosion_position = get_node("../TileMap").map_to_local(_b) + Vector2(0,0) / 2
+	explosion_instance.set_name("explosion")
+	get_parent().add_child(explosion_instance)
+	explosion_instance.position = explosion_position	
+	explosion_instance.position.y -= 16
+	explosion_instance.z_index = (_b.x + _b.y) + 1
+
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+			
+	attack_range = false		

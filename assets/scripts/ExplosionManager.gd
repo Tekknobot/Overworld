@@ -7,4 +7,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	pass
+	var tile_pos = get_node("../TileMap").local_to_map(self.position)
+	# Z index layering
+	self.z_index = (tile_pos.x + tile_pos.y) + 3

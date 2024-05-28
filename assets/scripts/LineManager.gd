@@ -2,6 +2,7 @@ extends Node2D
 
 @export var Map: TileMap
 @export var line_2d: Line2D
+@onready var laserstream = $"../LaserStream"
 
 var line2D = preload("res://assets/scenes/prefab/line_2d.scn")
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
@@ -50,8 +51,8 @@ func _input(event):
 					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
-					$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
-					$"../SoundStream".play()				
+					laserstream.stream = laserstream.map_sfx[0]
+					laserstream.play()				
 					await dup._intercept_bezier(line_2d, _point2, Vector2(0,-350), Vector2(0,-350), choose_random_point(), 1)
 					dup.queue_free()		
 					var explosion_instance = explosion.instantiate()
@@ -60,8 +61,8 @@ func _input(event):
 					explosion_instance.position = choose_random_point()
 					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
 					
-					$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
-					$"../SoundStream".play()
+					laserstream.stream = laserstream.map_sfx[1]
+					laserstream.play()
 					dup.queue_free()								
 						
 		#if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
@@ -133,8 +134,8 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 			explosion_instance.position = explosion_pos
 			explosion_instance.z_index = point_pos.x + point_pos.y
 				
-			$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
-			$"../SoundStream".play()	
+			laserstream.stream = laserstream.map_sfx[1]
+			laserstream.play()	
 				
 	for i in 4:
 		line_inst.set_antialiased(false)
@@ -214,8 +215,8 @@ func cpu_attack():
 		#return
 	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
-	$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
-	$"../SoundStream".play()	
+	laserstream.stream = laserstream.map_sfx[0]
+	laserstream.play()	
 	for j in get_node("/root/Node2D").structures.size():
 		if coord_A == get_node("/root/Node2D").structures[j].coord:
 			var tween: Tween = create_tween()
@@ -234,8 +235,8 @@ func cpu_attack():
 		if Map.all_units[i].tile_pos == tile_map:
 			Map.all_units[i].get_child(0).play("death")	
 			Map.all_units[i].add_to_group("dead") 
-			$"../SoundStream".stream = $"../SoundStream".map_sfx[7]
-			$"../SoundStream".play()	
+			laserstream.stream = laserstream.map_sfx[7]
+			laserstream.play()	
 			var tween: Tween = create_tween()
 			for k in 8:
 				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
@@ -262,8 +263,8 @@ func cpu_attack_2():
 		#return
 	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
 	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
-	$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
-	$"../SoundStream".play()	
+	laserstream.stream = laserstream.map_sfx[0]
+	laserstream.play()	
 	for j in get_node("/root/Node2D").structures.size():
 		if coord_B == get_node("/root/Node2D").structures[j].coord:
 			var tween: Tween = create_tween()
@@ -281,8 +282,8 @@ func cpu_attack_2():
 	for i in Map.all_units.size():
 		if Map.all_units[i].tile_pos == tile_map:
 			Map.all_units[i].get_child(0).play("death")	
-			$"../SoundStream".stream = $"../SoundStream".map_sfx[7]
-			$"../SoundStream".play()	
+			laserstream.stream = laserstream.map_sfx[7]
+			laserstream.play()	
 			var tween: Tween = create_tween()
 			for k in 8:
 				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
@@ -307,11 +308,11 @@ func choose_random_point():
 	return _the_point	
 
 func _on_timer_timeout():
-	missile_launch()
+	#missile_launch()
 	pass
 
 func missile_launch():
-	if rng.randi_range(0, 1) == 0:
+	if rng.randi_range(0, 2) == 0:
 		cpu_attack()
 	else:
 		cpu_attack_2()
