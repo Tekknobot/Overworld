@@ -39,7 +39,8 @@ func spawn():
 	for i in 8:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
-		soldier_inst.add_to_group("humans")			
+		soldier_inst.add_to_group("humans")	
+		soldier_inst.add_to_group("alive")		
 		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		soldier_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
@@ -61,7 +62,8 @@ func spawn():
 	for i in 16:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
-		soldier_inst.add_to_group("cpu")			
+		soldier_inst.add_to_group("cpu")
+		soldier_inst.add_to_group("alive")			
 		var new_position = get_node("../TileMap").map_to_local(open_tiles[random[i]]) + Vector2(0,0) / 2
 		soldier_inst.position = Vector2(new_position.x, new_position.y-500)
 		var tween: Tween = create_tween()
