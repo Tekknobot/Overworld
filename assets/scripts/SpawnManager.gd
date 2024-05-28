@@ -36,7 +36,7 @@ func spawn():
 	random = get_random_numbers(0, open_tiles.size()/2)
 
 	# Drop soldier at start	
-	for i in 16:	
+	for i in 8:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("humans")			

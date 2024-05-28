@@ -468,7 +468,9 @@ func on_user():
 		if !user_units[i].is_in_group("dead"):
 			alive_humans.append(user_units[i])
 
-
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return	
+		
 	var target_human = rng.randi_range(0,alive_humans.size()-1)
 	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
 	var active_unit = alive_humans[target_human]
@@ -1030,6 +1032,9 @@ func on_cpu():
 		if !cpu_units[i].is_in_group("dead"):
 			alive_cpu.append(cpu_units[i])
 
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return	
+			
 	var target_human = rng.randi_range(0,alive_cpu.size()-1)
 	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
 	var active_unit = alive_cpu[target_human]
