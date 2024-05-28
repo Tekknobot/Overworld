@@ -176,7 +176,7 @@ func _input(event):
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
 							var tween = create_tween()
-							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.1)								
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.15)								
 							await tween.finished
 							user_units[selected_unit_num].get_child(0).play("default")
 							for i in user_units.size():
@@ -192,7 +192,7 @@ func _input(event):
 							var unit_pos = local_to_map(user_units[selected_unit_num].position)
 							user_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
 							var tween = create_tween()
-							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.1)								
+							tween.tween_property(user_units[selected_unit_num], "position", tile_center_position, 0.15)								
 							await tween.finished
 							user_units[selected_unit_num].get_child(0).play("default")
 							for i in user_units.size():
@@ -1361,7 +1361,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 			var patharray = astar_grid.get_point_path(active_pos, cpu_surrounding_cells[open_tile])
 			# Find path and set hover cells
 			for h in patharray.size():
-				await get_tree().create_timer(0.01).timeout
+				await get_tree().create_timer(0.1).timeout
 				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
 				if h == active_unit.unit_movement:
 					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
@@ -1374,7 +1374,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.15)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
@@ -1388,7 +1388,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var unit_pos = local_to_map(active_unit.position)
 					active_unit.z_index = unit_pos.x + unit_pos.y																					
 					var tween = create_tween()
-					tween.tween_property(active_unit, "position", tile_center_position, 0.1)								
+					tween.tween_property(active_unit, "position", tile_center_position, 0.15)								
 					await tween.finished
 					active_unit.get_child(0).play("default")
 					for i in user_units.size():
