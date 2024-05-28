@@ -150,8 +150,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 							
 	await get_tree().create_timer(0.3).timeout
 	onTrajectory = false
-				
-		
+						
 func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
 	var line_inst = line2D.instantiate()
@@ -254,7 +253,7 @@ func cpu_attack_2():
 	dup_cpu.add_to_group("trajectories_cpu")
 	cpu_traj = dup_cpu	
 	var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
-	var coord_B = Map.alive_humans[rng.randi_range(0, Map.alive_humans.size()-1)].tile_pos			
+	var coord_B = Map.all_units[rng.randi_range(0, Map.all_units.size()-1)].tile_pos			
 	#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#if coord_B.y < 32:
@@ -271,26 +270,26 @@ func cpu_attack_2():
 			for k in 8:
 				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)	
 	var tile_map = Map.local_to_map(tile_pos2)
-	for i in Map.user_units.size():
-		if Map.user_units[i].tile_pos == tile_map:
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
 			var tween: Tween = create_tween()		
 			for k in 8:
-				tween.tween_property(Map.user_units[i], "modulate:v", 1, 0.1).from(5)										
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
 	Map.show_attack_range(coord_B)				
 	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)
 	
-	for i in Map.user_units.size():
-		if Map.user_units[i].tile_pos == tile_map:
-			Map.user_units[i].get_child(0).play("death")	
-			Map.user_units[i].add_to_group("dead")
-			Map.user_units[i].remove_from_group("alive")
+	for i in Map.all_units.size():
+		if Map.all_units[i].tile_pos == tile_map:
+			Map.all_units[i].get_child(0).play("death")	
+			Map.all_units[i].add_to_group("dead")
+			Map.all_units[i].remove_from_group("alive")
 			laserstream.stream = laserstream.map_sfx[7]
 			laserstream.play()	
 			var tween: Tween = create_tween()
 			for k in 8:
-				tween.tween_property(Map.user_units[i], "modulate:v", 1, 0.1).from(5)	
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
 			await get_tree().create_timer(1).timeout			
-			Map.user_units[i].position.y = -1500
+			Map.all_units[i].position.y = -1500
 	
 	if !dup_cpu:
 		return					
