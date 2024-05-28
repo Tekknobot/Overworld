@@ -254,7 +254,7 @@ func cpu_attack_2():
 	dup_cpu.add_to_group("trajectories_cpu")
 	cpu_traj = dup_cpu	
 	var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
-	var coord_B = Map.user_units[rng.randi_range(0, Map.alive_humans.size()-1)].tile_pos			
+	var coord_B = Map.alive_humans[rng.randi_range(0, Map.alive_humans.size()-1)].tile_pos			
 	#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#if coord_B.y < 32:
@@ -282,6 +282,8 @@ func cpu_attack_2():
 	for i in Map.user_units.size():
 		if Map.user_units[i].tile_pos == tile_map:
 			Map.user_units[i].get_child(0).play("death")	
+			Map.user_units[i].add_to_group("dead")
+			Map.user_units[i].remove_from_group("alive")
 			laserstream.stream = laserstream.map_sfx[7]
 			laserstream.play()	
 			var tween: Tween = create_tween()

@@ -486,7 +486,7 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
-									await get_tree().create_timer(0.1).timeout
+									await get_tree().create_timer(1).timeout
 									user_units[i].get_child(0).play("default")		
 									
 									var _bumpedvector = cpu_units[l].tile_pos
@@ -908,8 +908,8 @@ func on_cpu():
 	await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
 	await remove_hover_tiles()
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
-	await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
-	await remove_hover_tiles()
+	#await cpu_range_ai(closest_humans_to_cpu.tile_pos, active_unit)
+	#await remove_hover_tiles()
 	await linemanager.missile_launch()
 
 func cpu_range_ai(closest_humans_to_cpu: Vector2i, active_unit: Area2D):
@@ -962,10 +962,10 @@ func cpu_range_ai(closest_humans_to_cpu: Vector2i, active_unit: Area2D):
 									soundstream.stream = soundstream.map_sfx[3]
 									soundstream.play()	
 															
-									await get_tree().create_timer(0.1).timeout
+									await get_tree().create_timer(1).timeout
 									cpu_units[i].get_child(0).play("default")		
 									
-									var _bumpedvector = cpu_units[l].tile_pos
+									var _bumpedvector = user_units[l].tile_pos
 									var right_clicked_pos = local_to_map(cpu_units[i].position)
 																		 	
 									await SetLinePoints(Vector2(cpu_units[i].position.x, cpu_units[i].position.y-16), closest)
