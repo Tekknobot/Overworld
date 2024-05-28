@@ -898,8 +898,9 @@ func on_cpu():
 	for i in cpu_units.size():
 		if cpu_units[i].is_in_group("alive"):
 			alive_cpu.append(cpu_units[i])
-	
-	print(alive_cpu.size())
+			
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return	
 		
 	var target_human = rng.randi_range(0,alive_cpu.size()-1)
 	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
