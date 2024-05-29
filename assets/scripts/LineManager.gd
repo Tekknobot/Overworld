@@ -253,7 +253,7 @@ func cpu_attack_2():
 	dup_cpu.add_to_group("trajectories_cpu")
 	cpu_traj = dup_cpu	
 	var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
-	var coord_B = Map.all_units[rng.randi_range(0, Map.all_units.size()-1)].tile_pos			
+	var coord_B = Map.alive_all[rng.randi_range(0, Map.alive_all.size()-1)].tile_pos			
 	#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
 	#if coord_B.y < 32:

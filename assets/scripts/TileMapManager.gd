@@ -33,6 +33,7 @@ var attack_range = false
 var _temp
 var alive_humans = []
 var alive_cpu = []
+var alive_all = []
 
 var dead_humans = 0
 var dead_cpu = 0
@@ -443,7 +444,8 @@ func remove_hover_tiles():
 func on_user():
 	all_units.clear()
 	user_units.clear()
-	cpu_units.clear()	
+	cpu_units.clear()
+	alive_all.clear()	
 	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
@@ -451,7 +453,8 @@ func on_user():
 	all_units.append_array(humans)	
 	all_units.append_array(cpu)		
 	user_units.append_array(humans)
-	cpu_units.append_array(cpu)		
+	cpu_units.append_array(cpu)	
+		
 	
 	#Remove hover tiles										
 	for j in grid_height:
@@ -464,11 +467,13 @@ func on_user():
 	for i in user_units.size():
 		if user_units[i].is_in_group("alive"):
 			alive_humans.append(user_units[i])
+			alive_all.append(user_units[i])
 			
 	alive_cpu.clear()
 	for i in cpu_units.size():
 		if cpu_units[i].is_in_group("alive"):
 			alive_cpu.append(cpu_units[i])
+			alive_all.append(cpu_units[i])
 			
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return	
@@ -1009,6 +1014,7 @@ func on_cpu():
 	all_units.clear()
 	user_units.clear()
 	cpu_units.clear()	
+	alive_all.clear()
 	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
@@ -1029,11 +1035,13 @@ func on_cpu():
 	for i in user_units.size():
 		if user_units[i].is_in_group("alive"):
 			alive_humans.append(user_units[i])
+			alive_all.append(user_units[i])
 			
 	alive_cpu.clear()
 	for i in cpu_units.size():
 		if cpu_units[i].is_in_group("alive"):
 			alive_cpu.append(cpu_units[i])
+			alive_all.append(cpu_units[i])
 			
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return	
@@ -1647,9 +1655,13 @@ func SetLinePoints(a: Vector2, b: Vector2):
 			
 	attack_range = false		
 
-func ai_mode():
+func ai_mode():		
 	await on_user()
 	await on_cpu()
-	ai_mode()	
+	
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return
+					
+	ai_mode()
 	
 	
