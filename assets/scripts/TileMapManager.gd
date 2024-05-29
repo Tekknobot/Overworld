@@ -37,6 +37,8 @@ var alive_cpu = []
 var dead_humans = 0
 var dead_cpu = 0
 
+var attack_pos
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
@@ -200,9 +202,9 @@ func _input(event):
 								
 							moving = false		
 							soundstream.stream = soundstream.map_sfx[6]
-							soundstream.play()
+							soundstream.play()				
 					
-					await user_range_ai(user_units[selected_unit_num].tile_pos, user_units[selected_unit_num])	
+					await user_range_ai(user_units[selected_unit_num])	
 					on_cpu()														
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
@@ -436,13 +438,12 @@ func remove_hover_tiles():
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 
-func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
+func user_range_ai(active_unit: Area2D):
 	#Remove hover tiles										
 	for j in grid_height:
 		for k in grid_width:
 			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
 																						
-	var closest_position = map_to_local(closest_cpu_to_human) + Vector2(0,0) / 2	
 	var tile_pos = local_to_map(active_unit.position)		
 				
 	for i in user_units.size():
@@ -675,10 +676,10 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_pos.x:
 										active_unit.scale.x = -1	
 									
-									if active_unit.scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
+									if active_unit.scale.x == -1 and active_unit.position.x > attack_center_pos.x:
 										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
+									elif user_units[i].scale.x == 1 and active_unit.position.x < attack_center_pos.x:
 										user_units[i].scale.x = -1																																					
 															
 									user_units[i].get_child(0).play("attack")	
@@ -769,17 +770,17 @@ func user_range_ai(closest_cpu_to_human: Vector2i, active_unit: Area2D):
 									var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
 									var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
 									
-									if user_units[i].scale.x == 1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == 1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == -1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1	
+									elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1	
 									
-									if user_units[i].scale.x == -1 and user_units[i].position.x > attack_center_pos.x:
-										user_units[i].scale.x = 1
+									if active_unit.scale.x == -1 and active_unit.position.x > attack_center_pos.x:
+										active_unit.scale.x = 1
 									
-									elif user_units[i].scale.x == 1 and user_units[i].position.x < attack_center_pos.x:
-										user_units[i].scale.x = -1																																					
+									elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_pos.x:
+										active_unit.scale.x = -1																																					
 															
 									user_units[i].get_child(0).play("attack")	
 									
@@ -1478,7 +1479,6 @@ func arrays():
 		if !cpu_units[i].is_in_group("dead"):
 			alive_cpu.append(cpu_units[i])			
 
-	
 func SetLinePoints(a: Vector2, b: Vector2):
 	var _a = get_node("../TileMap").local_to_map(a)
 	var _b = get_node("../TileMap").local_to_map(b)		
