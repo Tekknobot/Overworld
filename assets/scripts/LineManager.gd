@@ -314,7 +314,7 @@ func _on_timer_timeout():
 	pass
 
 func missile_launch():
-	if rng.randi_range(0, 2) == 0:
+	if rng.randi_range(0, 1) == 0:
 		cpu_attack()
 	else:
 		cpu_attack_2()

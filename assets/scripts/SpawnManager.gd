@@ -29,11 +29,11 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) == 3 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(0, open_tiles.size()/2)
+	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop soldier at start	
 	for i in 64:	
@@ -52,11 +52,11 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) == 0 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(open_tiles.size()/2, open_tiles.size())
+	random = get_random_numbers(0, open_tiles.size())
 
 	# Drop soldier_cpu at start	
 	for i in 64:	

@@ -1655,10 +1655,12 @@ func SetLinePoints(a: Vector2, b: Vector2):
 			
 	attack_range = false		
 
-func ai_mode():		
-	await on_user()
+func ai_mode():			
+	await on_user()	
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return
+			
 	await on_cpu()
-	
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return
 					
