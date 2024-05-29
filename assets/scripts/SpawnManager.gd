@@ -7,8 +7,8 @@ var rng = RandomNumberGenerator.new()
 var open_tiles = []
 var random = []
 
-var grid_width = 32
-var grid_height = 32
+var grid_width = 64
+var grid_height = 64
 
 var soldier = preload("res://assets/scenes/prefab/Soldier.scn")
 
@@ -36,7 +36,7 @@ func spawn():
 	random = get_random_numbers(0, open_tiles.size()/2)
 
 	# Drop soldier at start	
-	for i in 16:	
+	for i in 64:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("humans")	
@@ -59,7 +59,7 @@ func spawn():
 	random = get_random_numbers(open_tiles.size()/2, open_tiles.size())
 
 	# Drop soldier_cpu at start	
-	for i in 16:	
+	for i in 64:	
 		var soldier_inst = soldier.instantiate()
 		node2D.add_child(soldier_inst)
 		soldier_inst.add_to_group("cpu")

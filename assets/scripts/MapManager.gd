@@ -20,9 +20,9 @@ var blank = preload("res://assets/scenes/prefab/blank.scn")
 
 var building = preload("res://assets/scenes/prefab/building_c.scn")
 var building2 = preload("res://assets/scenes/prefab/building_c2.scn")
-var tower = preload("res://assets/scenes/prefab/building_c3.scn")
+var tower = preload("res://assets/scenes/prefab/district.scn")
 var stadium = preload("res://assets/scenes/prefab/stadium.scn")
-var district = preload("res://assets/scenes/prefab/district.scn")
+var district = preload("res://assets/scenes/prefab/building_c3.scn")
 
 var map_pos = Vector2(0,0)
 var road_pos = Vector2(0,0)
@@ -31,8 +31,8 @@ var tile_id
 var fastNoiseLite = FastNoiseLite.new()
 var grid = []
 
-var grid_width = 32
-var grid_height = 32
+var grid_width = 64
+var grid_height = 64
 
 var structures: Array[Area2D]
 var structures_blank: Array[Area2D]

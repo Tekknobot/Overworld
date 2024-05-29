@@ -5,8 +5,8 @@ extends TileMap
 @onready var linemanager = $"../LineManager"
 
 var grid = []
-var grid_width = 32
-var grid_height = 32
+var grid_width = 64
+var grid_height = 64
 
 var astar_grid = AStarGrid2D.new()
 var clicked_pos = Vector2i(0,0);
@@ -113,7 +113,7 @@ func _input(event):
 	if event is InputEventKey:	
 		if event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()				
-		if event.pressed and event.keycode == KEY_3:
+		if event.pressed and event.keycode == KEY_1:
 			ai_mode()
 										
 	if event is InputEventMouseButton:

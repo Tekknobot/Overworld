@@ -16,8 +16,8 @@ var _point2 : Vector2
 
 var _the_point: Vector2
 
-var grid_width = 32
-var grid_height = 32
+var grid_width = 64
+var grid_height = 64
 
 var rng = RandomNumberGenerator.new()
 var trajectory_set = false
@@ -97,10 +97,11 @@ func _input(event):
 					#dup.queue_free()	
 										#
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1 and onTrajectory == false:
-			cpu_attack()
-		if event.keycode == KEY_2 and onTrajectory == false:
-			cpu_attack_2()	
+		#if event.keycode == KEY_1 and onTrajectory == false:
+			#cpu_attack()
+		#if event.keycode == KEY_2 and onTrajectory == false:
+			#cpu_attack_2()	
+		pass
 												
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
