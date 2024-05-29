@@ -21,8 +21,8 @@ var blank = preload("res://assets/scenes/prefab/blank.scn")
 var building = preload("res://assets/scenes/prefab/building_c.scn")
 var building2 = preload("res://assets/scenes/prefab/building_c2.scn")
 var tower = preload("res://assets/scenes/prefab/building_c3.scn")
-var stadium = preload("res://assets/scenes/prefab/building_c2.scn")
-var district = preload("res://assets/scenes/prefab/building_c.scn")
+var stadium = preload("res://assets/scenes/prefab/stadium.scn")
+var district = preload("res://assets/scenes/prefab/district.scn")
 
 var map_pos = Vector2(0,0)
 var road_pos = Vector2(0,0)
@@ -332,7 +332,7 @@ func spawn_buildings():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 1:
-				if rng.randi_range(0, 4) == 0:	
+				if rng.randi_range(0, 5) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var building_inst = building.instantiate()
@@ -351,7 +351,7 @@ func spawn_buildings():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 4:
-				if rng.randi_range(0, 4) == 0:	
+				if rng.randi_range(0, 5) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var building_inst = building2.instantiate()
@@ -392,7 +392,7 @@ func spawn_stadiums():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 2:
-				if rng.randi_range(0, 4) == 0:	
+				if rng.randi_range(0, 8) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var stadium_inst = stadium.instantiate()
@@ -414,7 +414,7 @@ func spawn_districts():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 6:	
-				if rng.randi_range(0, 4) == 0:	
+				if rng.randi_range(0, 5) == 0:	
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var district_inst = district.instantiate()
@@ -443,7 +443,7 @@ func spawn_towers_final():
 				progresscount += 1	
 								
 	for l in tower_coord.size():	
-		if rng.randi_range(0, 4) == 0:
+		if rng.randi_range(0, 5) == 0:
 			var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 			var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 			var tower_inst = tower.instantiate()
