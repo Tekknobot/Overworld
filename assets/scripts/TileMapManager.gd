@@ -494,7 +494,7 @@ func on_user():
 		return	
 		
 	var target_human = rng.randi_range(0,alive_humans.size()-1)
-	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_cpu()
+	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_godzilla()
 	var active_unit = alive_humans[target_human]
 	
 	await user_range_ai(active_unit)
@@ -1008,7 +1008,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
-					closest_atack.get_child(0).play("death")	
+					#closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
@@ -1076,7 +1076,7 @@ func on_cpu():
 		return	
 		
 	var target_human = rng.randi_range(0,alive_cpu.size()-1)
-	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_humans()
+	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_godzilla()
 	var active_unit = alive_cpu[target_human]
 	
 	await cpu_range_ai(active_unit)
@@ -1885,6 +1885,7 @@ func on_godzilla():
 		
 	var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
 	var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
+	#var closest_structure_to_cpu = node2D.structures[rng.randi_range(0,node2D.structures.size()-1)]
 	var active_unit = godzilla_units[target_godzilla]
 	
 	await godzilla_attack_ai(closest_structure_to_cpu, active_unit)

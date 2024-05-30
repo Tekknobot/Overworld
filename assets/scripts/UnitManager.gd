@@ -156,6 +156,20 @@ func get_closest_attack_structure():
 				
 	return closest_structure
 
+func get_closest_attack_godzilla():
+	var all_godzilla = get_tree().get_nodes_in_group("godzilla")
+	var closest_godzilla = null
+ 
+	if (all_godzilla.size() > 0):
+		closest_godzilla = all_godzilla[0]
+		for godzilla in all_godzilla:
+			var distance_to_this_player = global_position.distance_squared_to(godzilla.global_position)	
+			var distance_to_closest_godzilla = global_position.distance_squared_to(closest_godzilla.global_position)
+			if (distance_to_this_player < distance_to_closest_godzilla):
+				closest_godzilla = godzilla
+				
+	return closest_godzilla
+
 
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
