@@ -30,7 +30,7 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0,Vector2i(i,j)) == 1 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
@@ -53,7 +53,7 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0,Vector2i(i,j)) == 2 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
