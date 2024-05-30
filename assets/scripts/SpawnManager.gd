@@ -80,14 +80,14 @@ func spawn():
 	open_tiles.clear()	
 	for i in grid_width:
 		for j in grid_height:
-			if get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
+			if get_node("../TileMap").get_cell_source_id(0, Vector2i(i,j)) == 0 and get_node("../TileMap").astar_grid.is_point_solid(Vector2i(i,j)) == false:		
 				open_tiles.append(Vector2i(i,j))
 	
 	random.clear()
-	random = get_random_numbers(open_tiles.size()/2, open_tiles.size()/2 + 1)
+	random = get_random_numbers(0, open_tiles.size())
 	
 	# Drop Godzilla_cpu at start	
-	for i in 1:	
+	for i in 4:	
 		var godzilla_inst = godzilla.instantiate()
 		node2D.add_child(godzilla_inst)
 		godzilla_inst.add_to_group("godzilla")

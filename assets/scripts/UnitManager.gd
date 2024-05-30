@@ -27,6 +27,7 @@ var tile_pos
 var attacked = false
 var zombies = []
 var humans = []
+var godzilla = []
 var all_units = []
 
 var structures: Array[Area2D]
@@ -49,9 +50,11 @@ var in_water = false
 func _ready():
 	zombies = get_tree().get_nodes_in_group("zombies")
 	humans = get_tree().get_nodes_in_group("humans")
+	godzilla = get_tree().get_nodes_in_group("godzilla")
 	
 	all_units.append_array(zombies)
 	all_units.append_array(humans)
+	all_units.append_array(godzilla)
 
 	buildings = get_tree().get_nodes_in_group("buildings")
 	towers = get_tree().get_nodes_in_group("towers")

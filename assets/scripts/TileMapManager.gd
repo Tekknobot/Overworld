@@ -449,16 +449,20 @@ func remove_hover_tiles():
 func on_user():
 	all_units.clear()
 	user_units.clear()
-	cpu_units.clear()
-	alive_all.clear()	
+	cpu_units.clear()	
+	alive_all.clear()
+	godzilla_units.clear()
 	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
+	godzilla = get_tree().get_nodes_in_group("godzilla")
 	
 	all_units.append_array(humans)	
-	all_units.append_array(cpu)		
+	all_units.append_array(cpu)	
+	all_units.append_array(godzilla)	
 	user_units.append_array(humans)
-	cpu_units.append_array(cpu)	
+	cpu_units.append_array(cpu)		
+	godzilla_units.append_array(godzilla)
 		
 	
 	#Remove hover tiles										
@@ -479,6 +483,12 @@ func on_user():
 		if cpu_units[i].is_in_group("alive"):
 			alive_cpu.append(cpu_units[i])
 			alive_all.append(cpu_units[i])
+
+	alive_godzilla.clear()
+	for i in godzilla_units.size():
+		if godzilla_units[i].is_in_group("alive"):
+			alive_godzilla.append(godzilla_units[i])
+			alive_all.append(godzilla_units[i])
 			
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return	
@@ -492,6 +502,7 @@ func on_user():
 	await user_attack_ai(target_human, closest_humans_to_cpu, active_unit)
 	await user_range_ai(active_unit)
 	await remove_hover_tiles()
+	arrays()
 	await linemanager.missile_launch()
 
 func user_range_ai(active_unit: Area2D):
@@ -976,13 +987,16 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
 					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = -1
+						active_unit.scale.x = 1
+					
 					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = 1	
-					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
 						active_unit.scale.x = -1
+							
+					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
+						active_unit.scale.x = 1
+					
 					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = 1						
+						active_unit.scale.x = -1						
 		
 
 					active_unit.get_child(0).play("attack")	
@@ -1020,14 +1034,18 @@ func on_cpu():
 	user_units.clear()
 	cpu_units.clear()	
 	alive_all.clear()
+	godzilla_units.clear()
 	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
+	godzilla = get_tree().get_nodes_in_group("godzilla")
 	
 	all_units.append_array(humans)	
-	all_units.append_array(cpu)		
+	all_units.append_array(cpu)	
+	all_units.append_array(godzilla)	
 	user_units.append_array(humans)
 	cpu_units.append_array(cpu)		
+	godzilla_units.append_array(godzilla)	
 	
 	#Remove hover tiles										
 	for j in grid_height:
@@ -1047,6 +1065,12 @@ func on_cpu():
 		if cpu_units[i].is_in_group("alive"):
 			alive_cpu.append(cpu_units[i])
 			alive_all.append(cpu_units[i])
+
+	alive_godzilla.clear()
+	for i in godzilla_units.size():
+		if godzilla_units[i].is_in_group("alive"):
+			alive_godzilla.append(godzilla_units[i])
+			alive_all.append(godzilla_units[i])
 			
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return	
@@ -1060,6 +1084,7 @@ func on_cpu():
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, active_unit)
 	await cpu_range_ai(active_unit)
 	await remove_hover_tiles()
+	arrays()
 	await linemanager.missile_launch()
 
 func cpu_range_ai(active_unit: Area2D):
@@ -1544,14 +1569,16 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
 					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = -1
+						active_unit.scale.x = 1
+						
 					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = 1	
+						active_unit.scale.x = -1	
+						
 					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = -1
+						active_unit.scale.x = 1
+						
 					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = 1						
-		
+						active_unit.scale.x = -1						
 
 					active_unit.get_child(0).play("attack")	
 					
@@ -1586,15 +1613,20 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 func arrays():
 	all_units.clear()
 	user_units.clear()
-	cpu_units.clear()		
+	cpu_units.clear()	
+	alive_all.clear()
+	godzilla_units.clear()
 	
 	humans = get_tree().get_nodes_in_group("humans")
 	cpu = get_tree().get_nodes_in_group("cpu")
+	godzilla = get_tree().get_nodes_in_group("godzilla")
 	
 	all_units.append_array(humans)	
-	all_units.append_array(cpu)		
+	all_units.append_array(cpu)	
+	all_units.append_array(godzilla)	
 	user_units.append_array(humans)
-	cpu_units.append_array(cpu)			
+	cpu_units.append_array(cpu)		
+	godzilla_units.append_array(godzilla)		
 
 	alive_humans.clear()	
 	for i in user_units.size():
@@ -1606,6 +1638,12 @@ func arrays():
 		if !cpu_units[i].is_in_group("dead"):
 			alive_cpu.append(cpu_units[i])			
 
+	alive_godzilla.clear()
+	for i in godzilla_units.size():
+		if godzilla_units[i].is_in_group("alive"):
+			alive_godzilla.append(godzilla_units[i])
+			alive_all.append(godzilla_units[i])
+			
 func SetLinePoints(a: Vector2, b: Vector2):
 	var _a = get_node("../TileMap").local_to_map(a)
 	var _b = get_node("../TileMap").local_to_map(b)		
@@ -1660,7 +1698,9 @@ func SetLinePoints(a: Vector2, b: Vector2):
 			
 	attack_range = false		
 
-func ai_mode():			
+func ai_mode():		
+	arrays()
+		
 	await on_user()	
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return
@@ -1741,16 +1781,23 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 			for i in 4:
 				var cpu_pos = local_to_map(godzilla.position)
 				if cpu_pos == cpu_surrounding_cells[i]:
-					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
+					var attack_center_position = map_to_local(closest_structure_to_godzilla.coord) + Vector2(0,0) / 2	
 								
 					if godzilla.scale.x == 1 and godzilla.position.x > attack_center_position.x:
-						godzilla.scale.x = -1
+						godzilla.scale.x = 1
+						print("1")
+						
 					elif godzilla.scale.x == -1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = 1	
+						godzilla.scale.x = -1	
+						print("2")
+						
 					if godzilla.scale.x == -1 and godzilla.position.x > attack_center_position.x:
-						godzilla.scale.x = -1
+						godzilla.scale.x = 1
+						print("3")
+						
 					elif godzilla.scale.x == 1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = 1						
+						godzilla.scale.x = -1	
+						print("4")					
 		
 
 					godzilla.get_child(0).play("attack")	
@@ -1758,24 +1805,25 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
 						
-					#await get_tree().create_timer(1).timeout
+					await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
-					closest_atack.get_child(0).play("demolished")	
-					
-					soundstream.stream = soundstream.map_sfx[7]
-					soundstream.play()		
-									
-					await get_tree().create_timer(1).timeout
 					
 					var explosion_instance = explosion.instantiate()
 					get_parent().add_child(explosion_instance)
-					var explosion_pos = map_to_local(closest_atack.coord) + Vector2(0,0) / 2
-					explosion_instance.position = explosion_pos
+					var explosion_pos = map_to_local(closest_structure_to_godzilla.coord) + Vector2(0,0) / 2
+					explosion_instance.position = explosion_pos		
+					explosion_instance.position.y -= 16
+								
+					soundstream.stream = soundstream.map_sfx[1]
+					soundstream.play()		
 									
-					closest_atack.add_to_group("demolished")
-					closest_atack.remove_from_group("structures")
+					await get_tree().create_timer(0).timeout
+					closest_structure_to_godzilla.get_child(0).play("demolished")	
+									
+					closest_structure_to_godzilla.add_to_group("demolished")
+					closest_structure_to_godzilla.remove_from_group("structures")
 					#closest_atack.position.y -= 1500
 					godzilla.get_child(0).play("default")	
 					break
@@ -1787,7 +1835,7 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 			godzilla.check_land()
 			godzilla.check_water()
 			godzilla.get_child(0).play("default")				
-			#on_cpu()
+			#on_godzilla()
 		
 func on_godzilla():
 	all_units.clear()
