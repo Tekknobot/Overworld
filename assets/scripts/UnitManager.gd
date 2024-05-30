@@ -139,6 +139,21 @@ func get_closest_attack_cpu():
 				
 	return closest_player
 
+func get_closest_attack_structure():
+	var all_structures = get_tree().get_nodes_in_group("structures")
+	var closest_structure = null
+ 
+	if (all_structures.size() > 0):
+		closest_structure = all_structures[0]
+		for structure in all_structures:
+			var distance_to_this_player = global_position.distance_squared_to(structure.global_position)	
+			var distance_to_closest_player = global_position.distance_squared_to(closest_structure.global_position)
+			if (distance_to_this_player < distance_to_closest_player):
+				closest_structure = structure
+				
+	return closest_structure
+
+
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
 		self.get_child(0).play("water")	

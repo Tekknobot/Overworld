@@ -4,6 +4,8 @@ extends TileMap
 @onready var soundstream = $"../SoundStream"
 @onready var linemanager = $"../LineManager"
 
+var explosion = preload("res://assets/scenes/vfx/explosion.scn")
+
 var grid = []
 var grid_width = 64
 var grid_height = 64
@@ -16,9 +18,11 @@ var open_tiles = []
 
 var humans = []
 var cpu = []
+var godzilla = []
 var all_units = []
 var user_units = []
 var cpu_units = []
+var godzilla_units = []
 
 var selected_pos = Vector2i(0,0);
 var target_pos = Vector2i(0,0);
@@ -34,6 +38,7 @@ var _temp
 var alive_humans = []
 var alive_cpu = []
 var alive_all = []
+var alive_godzilla = []
 
 var dead_humans = 0
 var dead_cpu = 0
@@ -1663,7 +1668,177 @@ func ai_mode():
 	await on_cpu()
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return
-					
+	
+	await on_godzilla()	
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return
+						
 	ai_mode()
 	
+func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D):				
+	if !closest_structure_to_godzilla.is_in_group("demolished"):
+		var closest_atack = closest_structure_to_godzilla							
+		var cpu_target_pos = local_to_map(closest_atack.position)
+		var cpu_surrounding_cells = get_surrounding_cells(cpu_target_pos)
+		var active_pos = local_to_map(godzilla.position)
+		
+		godzilla.get_child(0).play("move")
+		var open_tile = rng.randi_range(0,3)
+		if astar_grid.is_point_solid(cpu_surrounding_cells[open_tile]) == false and get_cell_source_id(0, cpu_surrounding_cells[open_tile]) != -1: 
+			
+			var patharray = astar_grid.get_point_path(active_pos, cpu_surrounding_cells[open_tile])
+			# Find path and set hover cells
+			for h in patharray.size():
+				await get_tree().create_timer(0.01).timeout
+				set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)
+				if h == godzilla.unit_movement:
+					get_node("../TileMap").set_cell(1, patharray[h], 15, Vector2i(0, 0), 0)			
+				
+			# Move unit		
+			for h in patharray.size():
+				moving = true		
+				if godzilla.check_water() == true:
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(godzilla.position)
+					godzilla.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(godzilla, "position", tile_center_position, 0.15)								
+					await tween.finished
+					godzilla.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false	
+					
+				elif godzilla.check_land() == true:							
+					godzilla.get_child(0).play("move")						
+					var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+					var unit_pos = local_to_map(godzilla.position)
+					godzilla.z_index = unit_pos.x + unit_pos.y																					
+					var tween = create_tween()
+					tween.tween_property(godzilla, "position", tile_center_position, 0.15)								
+					await tween.finished
+					godzilla.get_child(0).play("default")
+					for i in user_units.size():
+						user_units[i].selected = false
+						
+					moving = false		
+						
+					soundstream.stream = soundstream.map_sfx[6]
+					soundstream.play()						
+				
+				if h == godzilla.unit_movement:
+					break	
+									
+			moving = false
+							
+			# Remove hover cells
+			for h in patharray.size():
+				set_cell(1, patharray[h], -1, Vector2i(0, 0), 0)
+			
+			godzilla.get_child(0).play("default")	
+			
+			for i in 4:
+				var cpu_pos = local_to_map(godzilla.position)
+				if cpu_pos == cpu_surrounding_cells[i]:
+					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
+								
+					if godzilla.scale.x == 1 and godzilla.position.x > attack_center_position.x:
+						godzilla.scale.x = 1
+					elif godzilla.scale.x == -1 and godzilla.position.x < attack_center_position.x:
+						godzilla.scale.x = -1	
+					if godzilla.scale.x == -1 and godzilla.position.x > attack_center_position.x:
+						godzilla.scale.x = 1
+					elif godzilla.scale.x == 1 and godzilla.position.x < attack_center_position.x:
+						godzilla.scale.x = -1						
+		
+
+					godzilla.get_child(0).play("attack")	
+					
+					soundstream.stream = soundstream.map_sfx[4]
+					soundstream.play()							
+						
+					#await get_tree().create_timer(1).timeout
+					
+					var tween: Tween = create_tween()
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
+					closest_atack.get_child(0).play("demolished")	
+					
+					soundstream.stream = soundstream.map_sfx[7]
+					soundstream.play()		
+									
+					await get_tree().create_timer(1).timeout
+					
+					var explosion_instance = explosion.instantiate()
+					get_parent().add_child(explosion_instance)
+					var explosion_pos = map_to_local(closest_atack.coord) + Vector2(0,0) / 2
+					explosion_instance.position = explosion_pos
+									
+					closest_atack.add_to_group("demolished")
+					closest_atack.remove_from_group("structures")
+					#closest_atack.position.y -= 1500
+					godzilla.get_child(0).play("default")	
+					break
+									
+			moving = false
+			godzilla.check_land()
+			godzilla.check_water()	
+		else:
+			godzilla.check_land()
+			godzilla.check_water()
+			godzilla.get_child(0).play("default")				
+			#on_cpu()
+		
+func on_godzilla():
+	all_units.clear()
+	user_units.clear()
+	cpu_units.clear()	
+	alive_all.clear()
+	godzilla_units.clear()
 	
+	humans = get_tree().get_nodes_in_group("humans")
+	cpu = get_tree().get_nodes_in_group("cpu")
+	godzilla = get_tree().get_nodes_in_group("godzilla")
+	
+	all_units.append_array(humans)	
+	all_units.append_array(cpu)	
+	#all_units.append_array(godzilla)	
+	user_units.append_array(humans)
+	cpu_units.append_array(cpu)		
+	godzilla_units.append_array(godzilla)
+	
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	moving = false		
+	
+	alive_humans.clear()					
+	for i in user_units.size():
+		if user_units[i].is_in_group("alive"):
+			alive_humans.append(user_units[i])
+			alive_all.append(user_units[i])
+			
+	alive_cpu.clear()
+	for i in cpu_units.size():
+		if cpu_units[i].is_in_group("alive"):
+			alive_cpu.append(cpu_units[i])
+			alive_all.append(cpu_units[i])
+
+	alive_godzilla.clear()
+	for i in godzilla_units.size():
+		if godzilla_units[i].is_in_group("alive"):
+			alive_godzilla.append(godzilla_units[i])
+			alive_all.append(godzilla_units[i])
+			
+	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
+		return	
+		
+	var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
+	var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
+	var active_unit = godzilla_units[target_godzilla]
+	
+	await godzilla_attack_ai(closest_structure_to_cpu, active_unit)
+	await remove_hover_tiles()
+	await linemanager.missile_launch()	
