@@ -976,13 +976,13 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
 					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = 1
+						active_unit.scale.x = -1
 					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = -1	
+						active_unit.scale.x = 1	
 					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = 1
+						active_unit.scale.x = -1
 					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = -1						
+						active_unit.scale.x = 1						
 		
 
 					active_unit.get_child(0).play("attack")	
@@ -1544,13 +1544,13 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
 					if active_unit.scale.x == 1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = 1
+						active_unit.scale.x = -1
 					elif active_unit.scale.x == -1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = -1	
+						active_unit.scale.x = 1	
 					if active_unit.scale.x == -1 and active_unit.position.x > attack_center_position.x:
-						active_unit.scale.x = 1
+						active_unit.scale.x = -1
 					elif active_unit.scale.x == 1 and active_unit.position.x < attack_center_position.x:
-						active_unit.scale.x = -1						
+						active_unit.scale.x = 1						
 		
 
 					active_unit.get_child(0).play("attack")	
@@ -1744,13 +1744,13 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 					var attack_center_position = map_to_local(cpu_target_pos) + Vector2(0,0) / 2	
 								
 					if godzilla.scale.x == 1 and godzilla.position.x > attack_center_position.x:
-						godzilla.scale.x = 1
+						godzilla.scale.x = -1
 					elif godzilla.scale.x == -1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = -1	
+						godzilla.scale.x = 1	
 					if godzilla.scale.x == -1 and godzilla.position.x > attack_center_position.x:
-						godzilla.scale.x = 1
+						godzilla.scale.x = -1
 					elif godzilla.scale.x == 1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = -1						
+						godzilla.scale.x = 1						
 		
 
 					godzilla.get_child(0).play("attack")	
@@ -1802,7 +1802,7 @@ func on_godzilla():
 	
 	all_units.append_array(humans)	
 	all_units.append_array(cpu)	
-	#all_units.append_array(godzilla)	
+	all_units.append_array(godzilla)	
 	user_units.append_array(humans)
 	cpu_units.append_array(cpu)		
 	godzilla_units.append_array(godzilla)

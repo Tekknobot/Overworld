@@ -232,6 +232,12 @@ func cpu_attack():
 	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos, 1)
 	
 	for i in Map.all_units.size():
+		if Map.all_units[i].unit_name == "Godzilla":
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+			await get_tree().create_timer(1).timeout
+			return			
 		if Map.all_units[i].tile_pos == tile_map:
 			Map.all_units[i].get_child(0).play("death")	
 			Map.all_units[i].add_to_group("dead") 
@@ -280,6 +286,12 @@ func cpu_attack_2():
 	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)
 	
 	for i in Map.all_units.size():
+		if Map.all_units[i].unit_name == "Godzilla":
+			var tween: Tween = create_tween()
+			for k in 8:
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+			await get_tree().create_timer(1).timeout
+			return					
 		if Map.all_units[i].tile_pos == tile_map:
 			Map.all_units[i].get_child(0).play("death")	
 			Map.all_units[i].add_to_group("dead")
