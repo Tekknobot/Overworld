@@ -1007,8 +1007,14 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					#await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
-					#closest_atack.get_child(0).play("death")	
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)		
+					
+					if closest_atack.unit_name == "Godzilla":
+						return					
+					else:
+						pass
+									
+					closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
 					soundstream.play()		
@@ -1588,7 +1594,13 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					#await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
-					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)						
+					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)
+					
+					if closest_atack.unit_name == "Godzilla":
+						return
+					else:
+						pass
+																	
 					closest_atack.get_child(0).play("death")	
 					
 					soundstream.stream = soundstream.map_sfx[7]
@@ -1782,24 +1794,16 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 				var cpu_pos = local_to_map(godzilla.position)
 				if cpu_pos == cpu_surrounding_cells[i]:
 					var attack_center_position = map_to_local(closest_structure_to_godzilla.coord) + Vector2(0,0) / 2	
-								
+											
 					if godzilla.scale.x == 1 and godzilla.position.x > attack_center_position.x:
-						godzilla.scale.x = 1
-						print("1")
-						
+						godzilla.scale.x = 1				
 					elif godzilla.scale.x == -1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = -1	
-						print("2")
-						
+						godzilla.scale.x = -1							
 					if godzilla.scale.x == -1 and godzilla.position.x > attack_center_position.x:
 						godzilla.scale.x = 1
-						print("3")
-						
 					elif godzilla.scale.x == 1 and godzilla.position.x < attack_center_position.x:
-						godzilla.scale.x = -1	
-						print("4")					
-		
-
+						godzilla.scale.x = -1					
+						
 					godzilla.get_child(0).play("attack")	
 					
 					soundstream.stream = soundstream.map_sfx[4]

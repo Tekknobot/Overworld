@@ -45,6 +45,7 @@ var coord
 
 var in_water = false
 
+@onready var Map = $"../TileMap"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -87,12 +88,13 @@ func _process(_delta):
 	last_position = this_position
 	this_position = self.position
 
-	if this_position.x > last_position.x:
-		scale.x = -1
-		direction = Vector2.RIGHT
-	if this_position.x < last_position.x:
-		scale.x = 1	
-		direction = Vector2.LEFT
+	if Map.moving == true:
+		if this_position.x > last_position.x:
+			scale.x = -1
+			direction = Vector2.RIGHT
+		if this_position.x < last_position.x:
+			scale.x = 1	
+			direction = Vector2.LEFT
 		
 	self.tile_pos = get_node("../TileMap").local_to_map(self.position)
 	self.coord = self.tile_pos
@@ -149,6 +151,10 @@ func get_closest_attack_structure():
 	if (all_structures.size() > 0):
 		closest_structure = all_structures[0]
 		for structure in all_structures:
+			if structure.is_in_group("demolished"):
+				return
+			else:
+				pass
 			var distance_to_this_player = global_position.distance_squared_to(structure.global_position)	
 			var distance_to_closest_player = global_position.distance_squared_to(closest_structure.global_position)
 			if (distance_to_this_player < distance_to_closest_player):
