@@ -7,8 +7,8 @@ extends TileMap
 var explosion = preload("res://assets/scenes/vfx/explosion.scn")
 
 var grid = []
-var grid_width = 64
-var grid_height = 64
+var grid_width = 32
+var grid_height = 32
 
 var astar_grid = AStarGrid2D.new()
 var clicked_pos = Vector2i(0,0);
