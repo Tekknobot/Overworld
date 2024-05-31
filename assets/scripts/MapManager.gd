@@ -370,7 +370,7 @@ func spawn_buildings():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:	
-				if rng.randi_range(0, 1) == 0:
+				if rng.randi_range(0, 2) == 0:
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var building_inst = building.instantiate()

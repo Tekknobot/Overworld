@@ -26,7 +26,7 @@ var tile_pos
 @export  var healthbar : ProgressBar
 @export  var levelbar : ProgressBar
 
-
+@onready var laserstream = $"../LaserStream"
 
 var attacked = false
 var zombies = []
@@ -123,7 +123,7 @@ func _process(_delta):
 	if self.unit_name == "Godzilla":
 		if levelbar.value >= levelbar.max_value:
 			levelbar.value = 0
-			healthbar.value = healthbar.max_value
+			healthbar.value += 3
 			var tween: Tween = create_tween()
 			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)			
 			
@@ -133,6 +133,8 @@ func _process(_delta):
 			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)	
 			await get_tree().create_timer(0.68).timeout		
 			self.position.y -= 1500	
+			#laserstream.stream = laserstream.map_sfx[9]
+			#laserstream.play()				
 
 func get_closest_attack_humans():
 	var all_players = get_tree().get_nodes_in_group("humans")

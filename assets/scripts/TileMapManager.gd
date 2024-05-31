@@ -210,7 +210,7 @@ func _input(event):
 					var active_unit = godzilla_units[target_godzilla]
 					var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
 					await godzilla_melee_units_ai(closest_human_godzilla, active_unit)			
-					await godzilla_attack_ai(closest_structure_to_cpu, active_unit)	
+					#await godzilla_attack_ai(closest_structure_to_cpu, active_unit)	
 					remove_hover_tiles()
 					active_unit.get_child(0).play("default")
 					await on_user()		
@@ -218,86 +218,97 @@ func _input(event):
 
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
-				attack_range = false						
-				#Remove hover tiles										
-				for j in grid_height:
-					for k in grid_width:
-						set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
-																									
+				attack_range = false
 				var mouse_pos = get_global_mouse_position()
 				mouse_pos.y += 8
-				var tile_pos = local_to_map(mouse_pos)		
-				var tile_data = get_cell_tile_data(0, tile_pos)
+				var tile_pos = local_to_map(mouse_pos)
+				var mouse_position = map_to_local(tile_pos) + Vector2(0,0) / 2	
+				#var tile_data = get_cell_tile_data(0, tile_pos)
+
+				clicked_pos = tile_pos	
+				
+				arrays()
+					
+				# Return if clicked on struture
+				for i in node2D.structures.size():
+					var tile_center_pos = map_to_local(tile_pos) + Vector2(0,0) / 2
+					if node2D.structures[i].position == tile_center_pos:
+						return					
+				
+				for i in godzilla_units.size():
+					if godzilla_units[i].tile_pos == tile_pos and attack_range == false:
+						show_structure_range(tile_pos)
+						#show_full_range()
+						godzilla_units[i].selected = true
+						selected_unit_num = i
+						selected_pos = godzilla_units[i].tile_pos
+						
+						soundstream.stream = soundstream.map_sfx[8]
+						soundstream.play()							
+						break
+																							
+				#Move unit
+				if get_cell_source_id(1, tile_pos) == 14 and astar_grid.is_point_solid(tile_pos) == false and godzilla_units[selected_unit_num].selected == true:
+					#Remove hover tiles										
+					for j in grid_height:
+						for k in grid_width:
+							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+											
+					target_pos = tile_pos 
+					var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+					
+					# Find path and set hover cells
+					for h in patharray.size():
+						set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)	
+											
+					# Move unit		
+					for h in patharray.size():
+						moving = true		
+						if godzilla_units[selected_unit_num].check_water() == true:
+							#user_units[selected_unit_num].get_child(0).play("move")
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(godzilla_units[selected_unit_num].position)
+							godzilla_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(godzilla_units[selected_unit_num], "position", tile_center_position, 0.15)								
+							await tween.finished
+							godzilla_units[selected_unit_num].get_child(0).play("default")
+							for i in user_units.size():
+								user_units[i].selected = false
+								
+							moving = false	
+							if godzilla_units[selected_unit_num].check_water() == true:
+								pass
 							
-				for i in user_units.size():
-					if user_units[i].tile_pos == tile_pos:
-						right_clicked_unit = user_units[i]
-						selected_unit_num = user_units[i].unit_num
-						selected_pos = user_units[i].tile_pos	
-						attack_range = true												
-						break	
-						
-				if tile_data is TileData:				
-					for i in godzilla_units.size():
-						var unit_pos = local_to_map(godzilla_units[i].position)
-
-						if unit_pos == tile_pos :																				
-							var hoverflag_1 = true															
-							for j in grid_height:	
-								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-								if hoverflag_1 == true:
-									for k in node2D.structures.size():
-										if tile_pos.x-j >= 0:	
-											set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 14, Vector2i(0, 0), 0)
-											if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and godzilla_units[i].tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
-												hoverflag_1 = false
-												break	
-									
-							var hoverflag_2 = true										
-							for j in grid_height:	
-								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-								if hoverflag_2 == true:											
-									for k in node2D.structures.size():																						
-										if tile_pos.y+j <= grid_height:
-											set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 14, Vector2i(0, 0), 0)
-											if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and godzilla_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
-												hoverflag_2 = false
-												break
-
-							var hoverflag_3 = true	
-							for j in grid_height:	
-								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-								if hoverflag_3 == true:											
-									for k in node2D.structures.size():																													
-										if tile_pos.x+j <= grid_height:
-											set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 14, Vector2i(0, 0), 0)
-											if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and godzilla_units[i].tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
-												hoverflag_3 = false
-												break
-
-							var hoverflag_4 = true	
-							for j in grid_height:	
-								set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
-								if hoverflag_4 == true:											
-									for k in node2D.structures.size():																											
-										if tile_pos.y-j >= 0:									
-											set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 14, Vector2i(0, 0), 0)
-											if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and godzilla_units[i].tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
-												hoverflag_4 = false
-												break
-						
-				if tile_pos.x == 0:
-					set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
-				if tile_pos.y == 0:
-					set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
-				if tile_pos.x == grid_height-1:
-					set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
-				if tile_pos.y == grid_height-1:
-					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
-
-				#soundstream.stream = soundstream.map_sfx[5]
-				#soundstream.play()
-														
+						elif godzilla_units[selected_unit_num].check_land() == true:							
+							godzilla_units[selected_unit_num].get_child(0).play("move")						
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(godzilla_units[selected_unit_num].position)
+							godzilla_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(godzilla_units[selected_unit_num], "position", tile_center_position, 0.15)								
+							await tween.finished
+							godzilla_units[selected_unit_num].get_child(0).play("default")
+							for i in godzilla_units.size():
+								godzilla_units[i].selected = false
+								
+							moving = false		
+							soundstream.stream = soundstream.map_sfx[6]
+							soundstream.play()				
+					
+					remove_hover_tiles()
+					
+					var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
+					var target_human = rng.randi_range(0,all_units.size()-1)		
+					var closest_human_godzilla = alive_godzilla[target_godzilla].get_closest_attack_humans()
+					var active_unit = godzilla_units[target_godzilla]
+					var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
+					#await godzilla_melee_units_ai(closest_human_godzilla, active_unit)			
+					await godzilla_attack_ai(closest_structure_to_cpu, active_unit)	
+					remove_hover_tiles()
+					active_unit.get_child(0).play("default")
+					await on_user()	
+																		
 func show_path(tile_pos):
 	#Remove hover tiles										
 	for j in grid_height:
@@ -434,6 +445,64 @@ func show_movement_range(tile_pos: Vector2i):
 	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-3), 7, Vector2i(0, 0), 0)															
 	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y-2), 7, Vector2i(0, 0), 0)																																								
 	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+3), 7, Vector2i(0, 0), 0)
+
+func show_structure_range(tile_pos: Vector2i):
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+	
+	#Place hover tiles		
+	var surrounding_cells = get_node("../TileMap").get_surrounding_cells(tile_pos)
+	
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)									
+		if surrounding_cells[k].x <= -1 or surrounding_cells[k].y >= 16 or surrounding_cells[k].x >= 16 or surrounding_cells[k].y <= -1:
+			set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+			set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y), -1, Vector2i(0, 0), 0)								
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-1, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+1), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-1), 14, Vector2i(0, 0), 0)								
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-2, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+2), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-2), 14, Vector2i(0, 0), 0)															
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-3, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+3), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-3), 14, Vector2i(0, 0), 0)	
+	for k in surrounding_cells.size():
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		set_cell(1, Vector2i(surrounding_cells[k].x+4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x-4, surrounding_cells[k].y), 14, Vector2i(0, 0), 0)															
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y+4), 14, Vector2i(0, 0), 0)																																								
+		set_cell(1, Vector2i(surrounding_cells[k].x, surrounding_cells[k].y-4), 14, Vector2i(0, 0), 0)	
+											
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y+3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y-2), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+2, tile_pos.y-3), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-3, tile_pos.y+2), 14, Vector2i(0, 0), 0)	
+
+	set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y+2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y-3), 14, Vector2i(0, 0), 0)															
+	set_cell(1, Vector2i(tile_pos.x+3, tile_pos.y-2), 14, Vector2i(0, 0), 0)																																								
+	set_cell(1, Vector2i(tile_pos.x-2, tile_pos.y+3), 14, Vector2i(0, 0), 0)
 
 func show_full_range():
 	#Remove hover tiles										
