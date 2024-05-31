@@ -215,7 +215,68 @@ func _input(event):
 					active_unit.get_child(0).play("default")
 					await on_user()		
 																
-
+				#Move unit
+				if get_cell_source_id(1, tile_pos) == 14 and astar_grid.is_point_solid(tile_pos) == false and godzilla_units[selected_unit_num].selected == true:
+					#Remove hover tiles										
+					for j in grid_height:
+						for k in grid_width:
+							set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)
+											
+					target_pos = tile_pos 
+					var patharray = astar_grid.get_point_path(selected_pos, target_pos)
+					
+					# Find path and set hover cells
+					for h in patharray.size():
+						set_cell(1, patharray[h], 7, Vector2i(0, 0), 0)	
+											
+					# Move unit		
+					for h in patharray.size():
+						moving = true		
+						if godzilla_units[selected_unit_num].check_water() == true:
+							#user_units[selected_unit_num].get_child(0).play("move")
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(godzilla_units[selected_unit_num].position)
+							godzilla_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(godzilla_units[selected_unit_num], "position", tile_center_position, 0.15)								
+							await tween.finished
+							godzilla_units[selected_unit_num].get_child(0).play("default")
+							for i in user_units.size():
+								user_units[i].selected = false
+								
+							moving = false	
+							if godzilla_units[selected_unit_num].check_water() == true:
+								pass
+							
+						elif godzilla_units[selected_unit_num].check_land() == true:							
+							godzilla_units[selected_unit_num].get_child(0).play("move")						
+							var tile_center_position = map_to_local(patharray[h]) + Vector2(0,0) / 2
+							var unit_pos = local_to_map(godzilla_units[selected_unit_num].position)
+							godzilla_units[selected_unit_num].z_index = unit_pos.x + unit_pos.y																					
+							var tween = create_tween()
+							tween.tween_property(godzilla_units[selected_unit_num], "position", tile_center_position, 0.15)								
+							await tween.finished
+							godzilla_units[selected_unit_num].get_child(0).play("default")
+							for i in godzilla_units.size():
+								godzilla_units[i].selected = false
+								
+							moving = false		
+							soundstream.stream = soundstream.map_sfx[6]
+							soundstream.play()				
+					
+					remove_hover_tiles()
+					
+					var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
+					var target_human = rng.randi_range(0,all_units.size()-1)		
+					var closest_human_godzilla = alive_godzilla[target_godzilla].get_closest_attack_humans()
+					var active_unit = godzilla_units[target_godzilla]
+					var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
+					#await godzilla_melee_units_ai(closest_human_godzilla, active_unit)			
+					await godzilla_attack_ai(closest_structure_to_cpu, active_unit)	
+					remove_hover_tiles()
+					active_unit.get_child(0).play("default")
+					await on_user()		
+	
 		if event.button_index == MOUSE_BUTTON_RIGHT and get_node("../SpawnManager").spawn_complete == true and moving == false:	
 			if event.pressed:
 				attack_range = false
