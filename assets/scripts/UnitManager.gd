@@ -131,7 +131,7 @@ func _process(_delta):
 			self.get_child(0).play("death")
 			var tween: Tween = create_tween()
 			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)	
-			await get_tree().create_timer(0.7).timeout		
+			await get_tree().create_timer(0.68).timeout		
 			self.position.y -= 1500	
 
 func get_closest_attack_humans():
