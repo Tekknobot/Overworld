@@ -294,8 +294,8 @@ func _input(event):
 				if tile_pos.y == grid_height-1:
 					set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
-				soundstream.stream = soundstream.map_sfx[5]
-				soundstream.play()
+				#soundstream.stream = soundstream.map_sfx[5]
+				#soundstream.play()
 														
 func show_path(tile_pos):
 	#Remove hover tiles										
@@ -500,13 +500,343 @@ func on_user():
 	var closest_humans_to_cpu = alive_humans[target_human].get_closest_attack_godzilla()
 	var active_unit = alive_humans[target_human]
 	
-	await user_range_ai(active_unit)
+	await user_range_godzilla_ai(closest_human_to_gozilla)
+	await remove_hover_tiles()	
+	await user_range_ai(closest_human_to_gozilla)
 	await remove_hover_tiles()
 	await user_attack_ai(target_human, closest_humans_to_cpu, closest_human_to_gozilla)
-	await user_range_ai(active_unit)
+	await user_range_ai(closest_human_to_gozilla)
+	await remove_hover_tiles()
+	await user_range_godzilla_ai(closest_human_to_gozilla)
 	await remove_hover_tiles()
 	arrays()
+	await get_tree().create_timer(1).timeout
 	await linemanager.missile_launch()
+
+func user_range_godzilla_ai(active_unit: Area2D):
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+																						
+	var tile_pos = local_to_map(active_unit.position)		
+				
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		if tile_pos.x-j >= 0:	
+			set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x-j, tile_pos.y):
+						print("A")
+						var closest =  map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0).timeout
+						active_unit.get_child(0).play("default")		
+						
+						var _bumpedvector = godzilla_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1	
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout	
+				break
+	active_unit.check_water()																																		
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																	
+		if tile_pos.y+j <= grid_height:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and active_unit.tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y+j):
+						print("B")
+						var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout
+				break	
+	active_unit.check_water()	
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																								
+		if tile_pos.x+j <= grid_height:
+			set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x+j, tile_pos.y):
+						print("C")
+						var closest =  map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+											
+						await get_tree().create_timer(0).timeout	
+				break
+	active_unit.check_water()
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																					
+		if tile_pos.y-j >= 0:									
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and active_unit.tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y-j):
+						print("D")
+						var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout
+				break	
+	active_unit.check_water()
+				
+	if tile_pos.x == 0:
+		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == 0:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+	if tile_pos.x == grid_height-1:
+		set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == grid_height-1:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
+
+	#soundstream.stream = soundstream.map_sfx[5]
+	#soundstream.play() 
 
 func user_range_ai(active_unit: Area2D):
 	#Remove hover tiles										
@@ -918,8 +1248,8 @@ func user_range_ai(active_unit: Area2D):
 	if tile_pos.y == grid_height-1:
 		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
-	soundstream.stream = soundstream.map_sfx[5]
-	soundstream.play() 
+	#soundstream.stream = soundstream.map_sfx[5]
+	#soundstream.play() 
 
 func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
@@ -1013,6 +1343,7 @@ func user_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)		
 					
 					if closest_atack.unit_name == "Godzilla":
+						closest_atack.healthbar.value -= 1
 						return					
 					else:
 						pass
@@ -1091,13 +1422,343 @@ func on_cpu():
 	var closest_humans_to_cpu = alive_cpu[target_human].get_closest_attack_godzilla()
 	var active_unit = alive_cpu[target_human]
 	
-	await cpu_range_ai(active_unit)
+	await cpu_range_godzilla_ai(closest_human_to_gozilla)
+	await remove_hover_tiles()	
+	await cpu_range_ai(closest_human_to_gozilla)
 	await remove_hover_tiles()
 	await cpu_attack_ai(target_human, closest_humans_to_cpu, closest_human_to_gozilla)
-	await cpu_range_ai(active_unit)
+	await cpu_range_ai(closest_human_to_gozilla)
+	await remove_hover_tiles()
+	await cpu_range_godzilla_ai(closest_human_to_gozilla)
 	await remove_hover_tiles()
 	arrays()
+	await get_tree().create_timer(1).timeout
 	await linemanager.missile_launch()
+
+func cpu_range_godzilla_ai(active_unit: Area2D):
+	#Remove hover tiles										
+	for j in grid_height:
+		for k in grid_width:
+			set_cell(1, Vector2i(j,k), -1, Vector2i(0, 0), 0)	
+																						
+	var tile_pos = local_to_map(active_unit.position)		
+				
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)
+		if tile_pos.x-j >= 0:	
+			set_cell(1, Vector2i(tile_pos.x-j, tile_pos.y), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x-j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x-j, tile_pos.y):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x-j, tile_pos.y):
+						print("A")
+						var closest =  map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x-j, tile_pos.y)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0).timeout
+						active_unit.get_child(0).play("default")		
+						
+						var _bumpedvector = godzilla_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()	
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()									
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout	
+				break
+	active_unit.check_water()																																		
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																	
+		if tile_pos.y+j <= grid_height:
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y+j), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y+j)) == true and active_unit.tile_pos != Vector2i(tile_pos.x, tile_pos.y+j):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y+j):
+						print("B")
+						var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y+j)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout
+				break	
+	active_unit.check_water()	
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																								
+		if tile_pos.x+j <= grid_height:
+			set_cell(1, Vector2i(tile_pos.x+j, tile_pos.y), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x+j, tile_pos.y)) == true and active_unit.tile_pos != Vector2i(tile_pos.x+j, tile_pos.y):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x+j, tile_pos.y):
+						print("C")
+						var closest =  map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x+j, tile_pos.y)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+											
+						await get_tree().create_timer(0).timeout	
+				break
+	active_unit.check_water()
+	for j in grid_height:	
+		set_cell(1, tile_pos, -1, Vector2i(0, 0), 0)																																					
+		if tile_pos.y-j >= 0:									
+			set_cell(1, Vector2i(tile_pos.x, tile_pos.y-j), 14, Vector2i(0, 0), 0)
+			if astar_grid.is_point_solid(Vector2i(tile_pos.x, tile_pos.y-j)) == true and active_unit.tile_pos != Vector2i(tile_pos.x, tile_pos.y-j):
+				for l in godzilla_units.size():
+					print(godzilla_units[l].tile_pos, " " ,Vector2i(tile_pos.x-j, tile_pos.y))
+					if godzilla_units[l].tile_pos == Vector2i(tile_pos.x, tile_pos.y-j):
+						print("D")
+						var closest =  map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
+						var attack_center_pos = map_to_local(Vector2i(tile_pos.x, tile_pos.y-j)) + Vector2(0,0) / 2	
+						
+						if active_unit.scale.x == 1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == -1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1	
+						
+						if active_unit.scale.x == -1 and active_unit.position.x > godzilla_units[l].position.x:
+							active_unit.scale.x = 1
+						
+						elif active_unit.scale.x == 1 and active_unit.position.x < godzilla_units[l].position.x:
+							active_unit.scale.x = -1																																					
+												
+						active_unit.get_child(0).play("attack")	
+						
+						soundstream.stream = soundstream.map_sfx[3]
+						soundstream.play()	
+												
+						await get_tree().create_timer(0.1).timeout
+						active_unit.get_child(0).play("default")	
+						
+						var _bumpedvector = cpu_units[l].tile_pos
+						var right_clicked_pos = local_to_map(active_unit.position)
+															 	
+						await SetLinePoints(Vector2(active_unit.position.x, active_unit.position.y-16), closest)
+						
+						if right_clicked_pos.y < godzilla_units[l].tile_pos.y and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y+1)) + Vector2(0,0) / 2	
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+								
+						if right_clicked_pos.y > godzilla_units[l].tile_pos.y and active_unit.position.x < attack_center_pos.x:								
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x, _bumpedvector.y-1)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false								
+							
+						if right_clicked_pos.x > godzilla_units[l].tile_pos.x and active_unit.position.x > attack_center_pos.x:	
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x-1, _bumpedvector.y)) + Vector2(0,0) / 2										
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false														
+							
+						if right_clicked_pos.x < godzilla_units[l].tile_pos.x and active_unit.position.x < attack_center_pos.x:
+							var tile_center_pos = map_to_local(Vector2i(_bumpedvector.x+1, _bumpedvector.y)) + Vector2(0,0) / 2
+							var tween: Tween = create_tween()
+							tween.tween_property(godzilla_units[l], "modulate:v", 1, 0.5).from(5)	
+							godzilla_units[l].healthbar.value -= 1
+							soundstream.stream = soundstream.map_sfx[1]
+							soundstream.play()								
+							attack_range = false
+													
+						await get_tree().create_timer(0).timeout
+				break	
+	active_unit.check_water()
+				
+	if tile_pos.x == 0:
+		set_cell(1, Vector2i(tile_pos.x-1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == 0:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y-1), -1, Vector2i(0, 0), 0)							
+	if tile_pos.x == grid_height-1:
+		set_cell(1, Vector2i(tile_pos.x+1, tile_pos.y), -1, Vector2i(0, 0), 0)
+	if tile_pos.y == grid_height-1:
+		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
+
+	#soundstream.stream = soundstream.map_sfx[5]
+	#soundstream.play() 
 
 func cpu_range_ai(active_unit: Area2D):
 	#Remove hover tiles										
@@ -1509,8 +2170,8 @@ func cpu_range_ai(active_unit: Area2D):
 	if tile_pos.y == grid_height-1:
 		set_cell(1, Vector2i(tile_pos.x, tile_pos.y+1), -1, Vector2i(0, 0), 0)	
 
-	soundstream.stream = soundstream.map_sfx[5]
-	soundstream.play() 
+	#soundstream.stream = soundstream.map_sfx[5]
+	#soundstream.play() 
 		
 func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit: Area2D):				
 	if !closest_cpu_to_human.is_in_group("dead"):
@@ -1603,6 +2264,7 @@ func cpu_attack_ai(target_human: int, closest_cpu_to_human: Area2D, active_unit:
 					tween.tween_property(closest_atack, "modulate:v", 1, 0.5).from(5)
 					
 					if closest_atack.unit_name == "Godzilla":
+						closest_atack.healthbar.value -= 1
 						return
 					else:
 						pass
@@ -1814,7 +2476,7 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 					
 					soundstream.stream = soundstream.map_sfx[4]
 					soundstream.play()							
-						
+					
 					await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
@@ -1836,6 +2498,7 @@ func godzilla_attack_ai(closest_structure_to_godzilla: Area2D, godzilla: Area2D)
 					closest_structure_to_godzilla.remove_from_group("structures")
 					#closest_atack.position.y -= 1500
 					godzilla.get_child(0).play("default")	
+					godzilla.levelbar.value += 1 
 					break
 									
 			moving = false
@@ -1927,8 +2590,8 @@ func godzilla_attack_units_ai(closest_human_to_godzilla: Area2D, godzilla: Area2
 					godzilla.get_child(0).play("attack")	
 					
 					soundstream.stream = soundstream.map_sfx[4]
-					soundstream.play()							
-						
+					soundstream.play()		
+											
 					await get_tree().create_timer(1).timeout
 					
 					var tween: Tween = create_tween()
@@ -1943,13 +2606,14 @@ func godzilla_attack_units_ai(closest_human_to_godzilla: Area2D, godzilla: Area2
 					soundstream.stream = soundstream.map_sfx[1]
 					soundstream.play()		
 					closest_human_to_godzilla.get_child(0).play("death")
-									
+					godzilla.levelbar.value += 1 				
 					await get_tree().create_timer(1).timeout	
 									
 					closest_human_to_godzilla.add_to_group("dead")
 					closest_human_to_godzilla.remove_from_group("alive")
 					closest_atack.position.y -= 1500
 					godzilla.get_child(0).play("default")	
+					
 					break
 									
 			moving = false
@@ -2007,22 +2671,25 @@ func on_godzilla():
 	if alive_cpu.size() <= 0 or alive_humans.size() <= 0:	
 		return	
 		
-	var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
-	var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
-	var target_human = rng.randi_range(0,all_units.size()-1)
 	if rng.randi_range(0,1) == 0:
+		var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)
+		var target_human = rng.randi_range(0,all_units.size()-1)		
 		var closest_human_godzilla = alive_godzilla[target_godzilla].get_closest_attack_humans()
 		var active_unit = godzilla_units[target_godzilla]
 		await godzilla_attack_units_ai(closest_human_godzilla, active_unit)
 		await remove_hover_tiles()
+		var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
 		await godzilla_attack_ai(closest_structure_to_cpu, active_unit)
 		await remove_hover_tiles()
 		await linemanager.missile_launch()			
 	else:
+		var target_godzilla = rng.randi_range(0,godzilla_units.size()-1)		
+		var target_human = rng.randi_range(0,all_units.size()-1)		
 		var closest_human_godzilla = alive_godzilla[target_godzilla].get_closest_attack_cpu()	
 		var active_unit = godzilla_units[target_godzilla]
 		await godzilla_attack_units_ai(closest_human_godzilla, active_unit)
 		await remove_hover_tiles()
+		var closest_structure_to_cpu = godzilla_units[target_godzilla].get_closest_attack_structure()
 		await godzilla_attack_ai(closest_structure_to_cpu, active_unit)
 		await remove_hover_tiles()
 		await linemanager.missile_launch()			

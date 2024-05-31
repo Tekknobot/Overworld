@@ -370,7 +370,7 @@ func spawn_buildings():
 	for i in grid_width:
 		for j in grid_height:
 			if Map.get_cell_source_id(0, Vector2i(i,j)) == 3:	
-				if rng.randi_range(0, 8) == 0:
+				if rng.randi_range(0, 1) == 0:
 					var tile_pos = Vector2i(i, j)
 					var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 					var building_inst = building.instantiate()
@@ -443,7 +443,7 @@ func spawn_towers_final():
 				progresscount += 1	
 								
 	for l in tower_coord.size():	
-		if rng.randi_range(0, 5) == 0:
+		if rng.randi_range(0, 1) == 0:
 			var tile_pos = tower_coord[rng.randi_range(0, tower_coord.size()-1)]
 			var tile_center_pos = Map.map_to_local(tile_pos) + Vector2(0,0) / 2		
 			var tower_inst = tower.instantiate()

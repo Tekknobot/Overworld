@@ -23,6 +23,10 @@ var tile_pos
 @export var selected = false
 
 @onready var root = $"."
+@export  var healthbar : ProgressBar
+@export  var levelbar : ProgressBar
+
+
 
 var attacked = false
 var zombies = []
@@ -115,6 +119,20 @@ func _process(_delta):
 
 	var unit_global_position = self.position
 	var unit_pos = get_node("../TileMap").local_to_map(unit_global_position)
+
+	if self.unit_name == "Godzilla":
+		if levelbar.value >= levelbar.max_value:
+			levelbar.value = 0
+			healthbar.value = healthbar.max_value
+			var tween: Tween = create_tween()
+			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)			
+			
+		if healthbar.value <= 0:
+			self.get_child(0).play("death")
+			var tween: Tween = create_tween()
+			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)	
+			await get_tree().create_timer(0.7).timeout		
+			self.position.y -= 1500	
 
 func get_closest_attack_humans():
 	var all_players = get_tree().get_nodes_in_group("humans")

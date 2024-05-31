@@ -227,15 +227,17 @@ func cpu_attack():
 		if Map.all_units[i].tile_pos == tile_map:
 			var tween: Tween = create_tween()		
 			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
-	Map.show_attack_range(coord_A)				
+				#tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)
+				pass										
+	#Map.show_attack_range(coord_A)				
 	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos, 1)
 	
 	for i in Map.all_units.size():
-		if Map.all_units[i].unit_name == "Godzilla":
+		if Map.all_units[i].unit_name == "Godzilla" and Map.all_units[i].tile_pos == tile_map:
 			var tween: Tween = create_tween()
 			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)
+			Map.all_units[i].healthbar -= 2	
 			await get_tree().create_timer(1).timeout
 			return			
 		if Map.all_units[i].tile_pos == tile_map:
@@ -282,14 +284,15 @@ func cpu_attack_2():
 			var tween: Tween = create_tween()		
 			for k in 8:
 				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
-	Map.show_attack_range(coord_B)				
+	#Map.show_attack_range(coord_B)				
 	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)
 	
 	for i in Map.all_units.size():
-		if Map.all_units[i].unit_name == "Godzilla":
+		if Map.all_units[i].unit_name == "Godzilla" and Map.all_units[i].tile_pos == tile_map:
 			var tween: Tween = create_tween()
 			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
+				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)
+			Map.all_units[i].healthbar.value -= 2		
 			await get_tree().create_timer(1).timeout
 			return					
 		if Map.all_units[i].tile_pos == tile_map:
@@ -326,7 +329,7 @@ func _on_timer_timeout():
 	pass
 
 func missile_launch():
-	if rng.randi_range(0, 1) == 0:
-		cpu_attack()
-	else:
+	if rng.randi_range(0, 0) == 0:
 		cpu_attack_2()
+	else:
+		cpu_attack()
