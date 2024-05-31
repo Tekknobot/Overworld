@@ -26,7 +26,7 @@ var tile_pos
 @export  var healthbar : ProgressBar
 @export  var levelbar : ProgressBar
 
-@onready var laserstream = $"../LaserStream"
+@onready var godzillastream = $"../GodzillaStream"
 
 var attacked = false
 var zombies = []
@@ -50,6 +50,7 @@ var coord
 var in_water = false
 
 @onready var Map = $"../TileMap"
+var play_once = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -128,13 +129,15 @@ func _process(_delta):
 			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)			
 			
 		if healthbar.value <= 0:
+			if play_once == false:
+				play_once = true
+				play_roar()
+				
 			self.get_child(0).play("death")
 			var tween: Tween = create_tween()
 			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)	
 			await get_tree().create_timer(0.68).timeout		
-			self.position.y -= 1500	
-			#laserstream.stream = laserstream.map_sfx[9]
-			#laserstream.play()				
+			self.position.y -= 1500				
 
 func get_closest_attack_humans():
 	var all_players = get_tree().get_nodes_in_group("humans")
@@ -209,3 +212,6 @@ func check_land():
 		self.in_water = false
 		return true		
 	
+func play_roar():
+	godzillastream.stream = godzillastream.map_sfx[9]
+	godzillastream.play()	
