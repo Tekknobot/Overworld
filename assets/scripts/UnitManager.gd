@@ -123,10 +123,13 @@ func _process(_delta):
 
 	if self.unit_name == "Godzilla":
 		if levelbar.value >= levelbar.max_value:
+			if play_once == false:
+				play_once = true
+				play_roar()				
 			levelbar.value = 0
 			healthbar.value = levelbar.max_value
 			var tween: Tween = create_tween()
-			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)			
+			tween.tween_property(self, "modulate:v", 1, 0.5).from(5)					
 			
 		if healthbar.value <= 0:
 			if play_once == false:
@@ -141,6 +144,7 @@ func _process(_delta):
 			self.self_modulate.a = 0			
 
 func get_closest_attack_humans():
+	play_once = false
 	var all_players = get_tree().get_nodes_in_group("humans")
 	var closest_player = null
  
@@ -155,6 +159,7 @@ func get_closest_attack_humans():
 	return closest_player
 
 func get_closest_attack_cpu():
+	play_once = false
 	var all_players = get_tree().get_nodes_in_group("cpu")
 	var closest_player = null
  
@@ -169,6 +174,7 @@ func get_closest_attack_cpu():
 	return closest_player
 
 func get_closest_attack_structure():
+	play_once = false
 	var all_structures = get_tree().get_nodes_in_group("structures")
 	var closest_structure = null
  
@@ -187,6 +193,7 @@ func get_closest_attack_structure():
 	return closest_structure
 
 func get_closest_attack_godzilla():
+	play_once = false
 	var all_godzilla = get_tree().get_nodes_in_group("godzilla")
 	var closest_godzilla = null
  
@@ -199,7 +206,6 @@ func get_closest_attack_godzilla():
 				closest_godzilla = godzilla
 				
 	return closest_godzilla
-
 
 func check_water():
 	if get_node("../TileMap").get_cell_source_id(0, self.tile_pos) == 0:
