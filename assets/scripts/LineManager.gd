@@ -43,7 +43,7 @@ func _input(event):
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				var mouse_local = Map.local_to_map(mouse_position)
-				if mouse_position != _point2:
+				if mouse_position != _point2 and Map.get_cell_source_id(0,mouse_local) == 6 or Map.get_cell_source_id(0,mouse_local) == 9 or Map.get_cell_source_id(0,mouse_local) == 10 or Map.get_cell_source_id(0,mouse_local) == 11 or Map.get_cell_source_id(0,mouse_local) == 12 or Map.get_cell_source_id(0,mouse_local) == 13:
 					var dup = self.duplicate()
 					self.get_parent().add_child(dup)
 					dup.add_to_group("trajectories")										
@@ -54,14 +54,7 @@ func _input(event):
 					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
 					$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
 					$"../SoundStream".play()			
-					await dup._cubic_bezier(line_2d, _point2, Vector2(0,-150), Vector2(0,-150), tile_pos2, 1)		
-					var explosion_instance = explosion.instantiate()
-					get_parent().add_child(explosion_instance)
-					var explosion_pos = Map.local_to_map(tile_pos2)
-					explosion_instance.position = tile_pos2
-					explosion_instance.z_index = (explosion_pos.x + explosion_pos.y) + 4000
-					$"../SoundStream".stream = $"../SoundStream".map_sfx[1]
-					$"../SoundStream".play()							
+					await dup._cubic_bezier(line_2d, _point2, Vector2(0,-150), Vector2(0,-150), tile_pos2, 1)									
 					var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
 					for i in trajects.size():
 						trajects[0].queue_free()						
