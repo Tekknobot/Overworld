@@ -20,9 +20,9 @@ var blank = preload("res://assets/scenes/prefab/blank.scn")
 
 var building = preload("res://assets/scenes/prefab/building_c.scn")
 var building2 = preload("res://assets/scenes/prefab/building_c2.scn")
-var tower = preload("res://assets/scenes/prefab/building_c3.scn")
+var tower = preload("res://assets/scenes/prefab/building_c2.scn")
 var stadium = preload("res://assets/scenes/prefab/stadium.scn")
-var district = preload("res://assets/scenes/prefab/building_c3.scn")
+var district = preload("res://assets/scenes/prefab/building_c.scn")
 
 var map_pos = Vector2(0,0)
 var road_pos = Vector2(0,0)

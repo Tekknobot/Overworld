@@ -487,7 +487,6 @@ func on_user():
 	await user_attack_ai(target_human, closest_humans_to_cpu, active_unit)
 	await user_range_ai(active_unit)
 	await remove_hover_tiles()
-	await linemanager.missile_launch()
 
 func user_range_ai(active_unit: Area2D):
 	#Remove hover tiles										
