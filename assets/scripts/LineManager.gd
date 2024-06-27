@@ -29,6 +29,7 @@ static var target
 var cpu_traj
 var missed = false
 
+var right_click_position
 
 func ready():
 	pass
@@ -37,33 +38,34 @@ func _process(_delta):
 	pass
 
 func _input(event):		
-	if event is InputEventMouseButton:														
+	if event is InputEventMouseButton:		
+		if event.button_index == MOUSE_BUTTON_RIGHT and onTrajectory == false:	
+			if event.pressed:	
+				right_click_position = get_global_mouse_position()	
+																	
 		if event.button_index == MOUSE_BUTTON_LEFT and onTrajectory == false:	
 			if event.pressed:		 
 				var mouse_position = get_global_mouse_position()
 				mouse_position.y += 8
 				var mouse_local = Map.local_to_map(mouse_position)
-				if mouse_position != _point2 and Map.get_cell_source_id(0,mouse_local) == 6 or Map.get_cell_source_id(0,mouse_local) == 9 or Map.get_cell_source_id(0,mouse_local) == 10 or Map.get_cell_source_id(0,mouse_local) == 11 or Map.get_cell_source_id(0,mouse_local) == 12 or Map.get_cell_source_id(0,mouse_local) == 13:
-					var dup = self.duplicate()
-					self.get_parent().add_child(dup)
-					dup.add_to_group("trajectories")										
-					_point2 = mouse_position		
-					var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-					var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-					var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
-					$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
-					$"../SoundStream".play()			
-					await dup._cubic_bezier(line_2d, _point2, Vector2(0,-150), Vector2(0,-150), tile_pos2, 1)									
-					var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
-					for i in trajects.size():
-						trajects[0].queue_free()						
-					dup.queue_free()	
-										
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1 and onTrajectory == false:
-			cpu_attack()
-		pass
+				for j in get_node("/root/Node2D").structures.size():
+					if Map.get_cell_source_id(1, mouse_local) == 14 and mouse_local == get_node("/root/Node2D").structures[j].coord:
+						var dup = self.duplicate()
+						self.get_parent().add_child(dup)
+						dup.add_to_group("trajectories")										
+						_point2 = right_click_position		
+						var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+						var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
+						var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
+						var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2									
+						$"../SoundStream".stream = $"../SoundStream".map_sfx[0]
+						$"../SoundStream".play()			
+						await dup._cubic_bezier(line_2d, _point2, Vector2(0,-150), Vector2(0,-150), mouse_position, 1)									
+						var trajects = get_tree().get_nodes_in_group("trajectories_cpu")
+						for i in trajects.size():
+							trajects[0].queue_free()						
+						dup.queue_free()
+						Map.on_cpu()	
 												
 func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float):
 	onTrajectory = true
@@ -77,7 +79,7 @@ func _cubic_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: V
 	for i in points.size():
 		line_inst.add_point(points[i])
 		target = points[points.size()/2]	
-		await get_tree().create_timer(0).timeout
+		await get_tree().create_timer(0.01).timeout
 
 	#line_2d.clear_points()	
 	var point_position = Map.local_to_map(points[points.size()-1])
@@ -161,93 +163,3 @@ func _intercept_bezier(line_2d: Line2D, p0: Vector2, p1: Vector2, p2: Vector2, p
 	await get_tree().create_timer(0.3).timeout
 	onTrajectory = false			
 
-func cpu_attack():
-	Map.arrays()
-	var dup_cpu = self.duplicate()
-	self.get_parent().add_child(dup_cpu)
-	dup_cpu.add_to_group("trajectories_cpu")
-	cpu_traj = dup_cpu	
-	var coord_A = Vector2i(rng.randi_range(0,grid_height), rng.randi_range(0,grid_height))
-	var coord_B = Map.alive_all[rng.randi_range(0, Map.alive_all.size()-1)].tile_pos			
-	#var coord_A = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-	#var coord_B = get_node("/root/Node2D").structures[rng.randi_range(0, get_node("/root/Node2D").structures.size()-1)].coord
-	#if coord_B.y < 32:
-		#dup_cpu.queue_free()
-		#cpu_attack()
-		#return
-	var tile_pos = Map.map_to_local(coord_A) + Vector2(0,0) / 2					
-	var tile_pos2 = Map.map_to_local(coord_B) + Vector2(0,0) / 2	
-	laserstream.stream = laserstream.map_sfx[0]
-	laserstream.play()	
-	for j in get_node("/root/Node2D").structures.size():
-		if coord_B == get_node("/root/Node2D").structures[j].coord:
-			var tween: Tween = create_tween()
-			for k in 8:
-				tween.tween_property(get_node("/root/Node2D").structures[j], "modulate:v", 1, 0.1).from(5)	
-	var tile_map = Map.local_to_map(tile_pos2)
-	for i in Map.all_units.size():
-		if Map.all_units[i].tile_pos == tile_map:
-			var tween: Tween = create_tween()		
-			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)										
-	#Map.show_attack_range(coord_B)				
-	await dup_cpu._cubic_bezier(line_2d, choose_random_point(), Vector2(0, -350), Vector2(0, -350), tile_pos2, 1)
-	
-	for i in Map.all_units.size():
-		if Map.all_units[i].unit_name == "Godzilla" and Map.all_units[i].tile_pos == tile_map:
-			var tween: Tween = create_tween()
-			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)
-			Map.all_units[i].healthbar.value -= 2
-			
-
-			var explosion_instance = explosion.instantiate()
-			get_parent().add_child(explosion_instance)
-			var explosion_pos = Map.map_to_local(Map.all_units[i].tile_pos) + Vector2(0,0) / 2
-			explosion_instance.position = explosion_pos		
-			explosion_instance.position.y -= 16
-			laserstream.stream = laserstream.map_sfx[1]
-			laserstream.play()	
-						
-			await get_tree().create_timer(1).timeout			
-				
-			laserstream.stream = laserstream.map_sfx[9]
-			laserstream.play()	
-			
-			await get_tree().create_timer(1).timeout
-			return					
-		if Map.all_units[i].tile_pos == tile_map:
-			Map.all_units[i].get_child(0).play("death")	
-			Map.all_units[i].add_to_group("dead")
-			Map.all_units[i].remove_from_group("alive")
-			laserstream.stream = laserstream.map_sfx[7]
-			laserstream.play()	
-			var tween: Tween = create_tween()
-			for k in 8:
-				tween.tween_property(Map.all_units[i], "modulate:v", 1, 0.1).from(5)	
-			await get_tree().create_timer(1).timeout			
-			Map.all_units[i].position.y = -1500
-	
-	if !dup_cpu:
-		return					
-	dup_cpu.queue_free()								
-
-func choose_random_point():
-	var rand = rng.randi_range(0,2)
-	if rand == 0:
-		_the_point = point1
-	if rand == 1:
-		_the_point = point2
-	if rand == 2:
-		_the_point = point3	
-	if rand == 3:
-		_the_point = point4	
-				
-	return _the_point	
-
-func _on_timer_timeout():
-	#missile_launch()
-	pass
-
-func missile_launch():
-	cpu_attack()
