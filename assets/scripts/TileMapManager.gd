@@ -5,8 +5,8 @@ extends TileMap
 @onready var linemanager = $"../LineManager"
 
 var grid = []
-var grid_width = 32
-var grid_height = 32
+var grid_width = 16
+var grid_height = 16
 
 var astar_grid = AStarGrid2D.new()
 var clicked_pos = Vector2i(0,0);

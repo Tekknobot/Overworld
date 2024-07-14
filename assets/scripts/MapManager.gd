@@ -31,8 +31,8 @@ var tile_id
 var fastNoiseLite = FastNoiseLite.new()
 var grid = []
 
-var grid_width = 32
-var grid_height = 32
+var grid_width = 16
+var grid_height = 16
 
 var structures: Array[Area2D]
 var structures_blank: Array[Area2D]

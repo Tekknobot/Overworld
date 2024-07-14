@@ -5,19 +5,19 @@ class_name MainCamera
 var _previousPosition: Vector2 = Vector2(0, 0);
 var _moveCamera: bool = false;
 
-var zoomTarget:float = 2
+var zoomTarget:float = 3
 
 func _input(event):
 	if event.is_action("zoom_out"):
 			# *(.2 * zoomTarget) to have the step between zoom in/out stable
 			# clamp alias min/max is to not flip the zoom and limit how many you can zoom
 			# get_axis to support mouse/key/joystick 
-		self.zoomTarget = 2
+		self.zoomTarget = 3
 		pass
 	pass
 	
 	if event.is_action("zoom_in"):
-		self.zoomTarget = 3
+		self.zoomTarget = 4
 		pass
 	pass
 		
